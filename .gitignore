@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+client_credentials.csv
+**/client_credentials.csv
+.credentials/
+data/raw/
+data/processed/
+*.parquet
+*.duckdb
+.DS_Store

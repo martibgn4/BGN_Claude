@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.milanuncios.com)",
+      "WebFetch(domain:www.deale.es)",
+      "WebFetch(domain:www.negociosenventa.es)",
+      "WebFetch(domain:reempresa.org)",
+      "WebFetch(domain:www.vscapital.cat)",
+      "WebFetch(domain:www.inverpoint.com)",
+      "WebFetch(domain:wizdolphin.es)",
+      "WebFetch(domain:www.bizalia.com)",
+      "Bash(grep -iE 'http|source|url|fuente' __TRACKED_VAR__.md)"
+    ]
+  }
+}

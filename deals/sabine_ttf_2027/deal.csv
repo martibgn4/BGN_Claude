@@ -1,0 +1,23 @@
+key,value
+name,Sabine FOB TTF-indexed 2027
+counterparty,UNSPECIFIED
+side,buy
+year,2027
+volume_tbtu_per_cargo,3.7
+origin,Sabine Pass
+incoterms,FOB
+index,TTF
+slope,1.0
+offset,0.0
+primary_destination,NWE
+alternate_destinations,Asia
+valuation_date,2026-05-28
+boiloff_per_day,0.00075
+discount_rate,0.05
+financing_per_mmbtu,0.15
+hedging_per_mmbtu,0.05
+extra_per_mmbtu,0.02
+port_musd:NWE,0.5
+port_musd:Asia,0.8
+emission_musd:NWE,1.2
+emission_musd:Asia,0.6

@@ -1,0 +1,18 @@
+facility_id,disruption_id,disruption_type,start_date,end_date,capacity_impact_mtpa,description,source,last_updated
+US-FREEPORT-T1,FREEPORT-FIRE-2022,unplanned_outage,2022-06-08,2023-02-13,5.0,Quintana Island liquefaction plant explosion forced full shutdown June 2022; partial restart Feb 2023; full restoration mid-2023,Freeport LNG press releases + FERC + Platts LNG Daily,2026-06-01
+US-FREEPORT-T2,FREEPORT-FIRE-2022,unplanned_outage,2022-06-08,2023-02-13,5.0,Same incident — all three trains taken offline,Freeport LNG press releases + FERC + Platts LNG Daily,2026-06-01
+US-FREEPORT-T3,FREEPORT-FIRE-2022,unplanned_outage,2022-06-08,2023-02-13,5.0,Same incident,Freeport LNG press releases + FERC + Platts LNG Daily,2026-06-01
+RU-ARCTIC2-T1,ARCTIC2-SANCTIONS,sanctions,2023-11-02,,4.6,US OFAC SDN designation Nov 2023; shadow fleet effort limited; ~2 MTPA achievable in 2024-2025,US Treasury OFAC + Argus + Reuters + Platts LNG Daily,2026-06-01
+RU-ARCTIC2-T2,ARCTIC2-T2-PAUSE,delay,2024-01-01,,6.6,Tow to site delayed; LNG carriers under sanction; effective indefinite pause,Argus + Reuters + Platts LNG Daily,2026-06-01
+RU-ARCTIC2-T3,ARCTIC2-T3-PAUSE,delay,2024-01-01,,6.6,Construction halted at module yard; no realistic delivery before 2028,Argus + Reuters + Platts LNG Daily,2026-06-01
+MZ-MOZAMBIQUE-LNG-T1,MZ-FORCE-MAJEURE-2021,force_majeure,2021-04-26,,6.44,TotalEnergies declared FM after Palma insurgent attack; security still patchy mid-2026; restart anticipated 2025-2026 then re-delayed,TotalEnergies + GIIGNL,2026-06-01
+MZ-MOZAMBIQUE-LNG-T2,MZ-FORCE-MAJEURE-2021,force_majeure,2021-04-26,,6.44,Same incident,Same,2026-06-01
+NO-SNOHVIT,SNOHVIT-FIRE-2020,unplanned_outage,2020-09-28,2022-06-02,4.0,Equinor Hammerfest LNG fire 2020; ~20 months full outage; full restart June 2022,Equinor + GIIGNL,2026-06-01
+EG-DAMIETTA,EG-DOMESTIC-CURTAIL-2022,force_majeure,2022-07-01,2024-09-01,3.0,Egyptian government redirected gas to power generation amid domestic shortage; Damietta intermittent throughout 2022-2024,Eni + Argus,2026-06-01
+EG-IDKU-T1,EG-DOMESTIC-CURTAIL-2022,force_majeure,2022-07-01,2024-09-01,2.0,Same domestic curtailment; one train idled for periods,Shell + Argus,2026-06-01
+AU-GORGON-T2,GORGON-T2-PROPANE-2021,maintenance,2021-05-01,2021-08-15,1.5,Propane line crack repair; extended unplanned maintenance,Chevron + ICIS,2026-06-01
+QA-QATARENERGY-NFE-T1,NFE-RAMP-SLIP-2026,ramp_slippage,2026-01-01,,2.0,COD slipped from initial 2026-Q1 target to 2026-Q4; partial revenue impact 2026,QatarEnergy + IGU 2025 update + Platts LNG Daily,2026-06-01
+US-GOLDENPASS-T1,GOLDENPASS-CONTRACTOR-2024,delay,2024-04-15,,5.2,Zachry bankruptcy filing forced contractor reshuffle; project pushed from 2024 to 2H 2026,Reuters + SEC filings + Platts LNG Daily,2026-06-01
+US-PLAQUEMINES-P1,PLAQUEMINES-OFFTAKE-DISPUTE,delay,2024-06-01,,3.0,Venture Global commercial-ops dispute with long-term offtakers; cargoes sold at spot until contract activation,Reuters + offtaker complaints + Platts LNG Daily,2026-06-01
+US-CORPUSCHRISTI-CC3,CC3-RAMP-2025,ramp_slippage,2025-03-01,,1.5,Stage 3 commissioning across 7 midscale trains progressing slower than initial schedule,Cheniere Q4 2024 earnings + Platts LNG Daily,2026-06-01
+MR-SN-TORTUE,TORTUE-RAMP-2025,ramp_slippage,2025-02-15,,1.0,Phase 1 first cargo Feb 2025 after multi-year delays; nameplate ramp ongoing into 2026,BP press releases + Platts LNG Daily,2026-06-01

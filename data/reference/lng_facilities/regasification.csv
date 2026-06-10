@@ -1,0 +1,69 @@
+facility_id,country,region,facility_name,operator,terminal_type,status,sendout_bcm_y,sendout_mtpa,storage_m3,start_date,reload_capable,source,last_updated,notes
+JP-FUTTSU,Japan,East Asia,Futtsu,TEPCO/Chubu,onshore,operational,30.0,22.0,1110000,1985-04-01,yes,Japan METI,2026-06-01,Largest single LNG terminal globally
+JP-OHGISHIMA,Japan,East Asia,Ohgishima,TEPCO,onshore,operational,12.5,9.2,540000,1998-04-01,yes,METI,2026-06-01,
+JP-HIGASHIOHGISHIMA,Japan,East Asia,Higashi-Ohgishima,TEPCO,onshore,operational,12.5,9.2,540000,1984-08-01,yes,METI,2026-06-01,
+JP-NEGISHI,Japan,East Asia,Negishi,Tokyo Gas/TEPCO,onshore,operational,10.0,7.4,2370000,1969-10-01,yes,Tokyo Gas,2026-06-01,Oldest commercial LNG terminal in Japan
+JP-SODEGAURA,Japan,East Asia,Sodegaura,Tokyo Gas,onshore,operational,17.6,13.0,2660000,1973-09-01,yes,Tokyo Gas,2026-06-01,
+JP-SENBOKU2,Japan,East Asia,Senboku II,Osaka Gas,onshore,operational,10.0,7.4,1820000,1972-04-01,yes,Osaka Gas,2026-06-01,
+JP-CHITA,Japan,East Asia,Chita Joint Works,Toho Gas/Chubu Electric,onshore,operational,9.5,7.0,1620000,1977-12-01,yes,Toho Gas,2026-06-01,Multi-operator complex
+JP-YOKKAICHI,Japan,East Asia,Yokkaichi,Chubu Electric,onshore,operational,10.0,7.4,640000,1988-02-01,yes,Chubu,2026-06-01,
+KR-INCHEON,South Korea,East Asia,Incheon,KOGAS,onshore,operational,36.0,26.5,3360000,1996-10-01,yes,KOGAS,2026-06-01,
+KR-PYEONGTAEK,South Korea,East Asia,Pyeongtaek,KOGAS,onshore,operational,42.0,30.9,3360000,1986-11-01,yes,KOGAS,2026-06-01,KOGAS' largest
+KR-TONGYEONG,South Korea,East Asia,Tongyeong,KOGAS,onshore,operational,29.8,21.9,2160000,2002-06-01,yes,KOGAS,2026-06-01,
+KR-SAMCHEOK,South Korea,East Asia,Samcheok,KOGAS,onshore,operational,18.0,13.2,1660000,2014-07-01,yes,KOGAS,2026-06-01,
+KR-BORYEONG,South Korea,East Asia,Boryeong,SK E&S/GS Energy,onshore,operational,4.8,3.5,400000,2017-01-01,yes,SK E&S,2026-06-01,Private; supplies SK power plants
+KR-GWANGYANG,South Korea,East Asia,Gwangyang,POSCO,onshore,operational,5.4,4.0,530000,2005-10-01,no,POSCO,2026-06-01,
+CN-TIANJIN,China,East Asia,Tianjin Nangang,Sinopec,onshore,operational,12.0,8.8,640000,2013-11-15,yes,Sinopec,2026-06-01,Strategic location for north China
+CN-YANGSHAN,China,East Asia,Yangshan Shanghai,CNOOC/Shenergy,onshore,operational,9.0,6.6,495000,2009-10-01,yes,CNOOC,2026-06-01,
+CN-CAOFEIDIAN,China,East Asia,Caofeidian,PetroChina,onshore,operational,10.0,7.4,720000,2013-11-23,yes,PetroChina,2026-06-01,
+CN-DAPENG,China,East Asia,Dapeng (Shenzhen),CNOOC,onshore,operational,9.4,6.9,640000,2006-06-26,yes,CNOOC,2026-06-01,First mainland China LNG terminal
+CN-TANGSHAN,China,East Asia,Tangshan,PetroChina,onshore,operational,10.0,7.4,800000,2014-11-04,yes,PetroChina,2026-06-01,
+CN-QINGDAO,China,East Asia,Qingdao,Sinopec,onshore,operational,6.0,4.4,640000,2014-11-15,yes,Sinopec,2026-06-01,
+CN-PUTIAN,China,East Asia,Putian (Fujian),CNOOC,onshore,operational,7.2,5.3,640000,2008-05-01,yes,CNOOC,2026-06-01,
+CN-WENZHOU,China,East Asia,Wenzhou,CNOOC,onshore,construction,8.5,6.3,800000,2026-09-30,yes,CNOOC,2026-06-01,Phase 1 expected late 2026
+IN-DAHEJ,India,South Asia,Dahej,Petronet LNG,onshore,operational,23.8,17.5,648000,2004-04-01,yes,Petronet,2026-06-01,India's largest regas
+IN-HAZIRA,India,South Asia,Hazira,Shell/TotalEnergies,onshore,operational,6.8,5.0,320000,2005-04-01,no,Shell,2026-06-01,
+IN-KOCHI,India,South Asia,Kochi,Petronet LNG,onshore,operational,6.8,5.0,320000,2013-08-01,no,Petronet,2026-06-01,Underutilized; pipeline-constrained
+IN-MUNDRA,India,South Asia,Mundra,Adani/IOCL,onshore,operational,6.8,5.0,320000,2020-04-01,no,Adani,2026-06-01,
+IN-ENNORE,India,South Asia,Ennore,IOCL/TIDCO,onshore,operational,6.8,5.0,360000,2019-03-01,no,IOCL,2026-06-01,Tamil Nadu
+IN-DHAMRA,India,South Asia,Dhamra,Adani/TotalEnergies,onshore,operational,6.8,5.0,360000,2024-04-01,no,Adani,2026-06-01,Odisha; commissioned Apr 2024
+GB-ISLEOFGRAIN,United Kingdom,Europe,Isle of Grain,National Grid Grain LNG,onshore,operational,19.5,14.3,1000000,2005-07-01,yes,National Grid,2026-06-01,UK's largest
+GB-SOUTHHOOK,United Kingdom,Europe,South Hook,QatarEnergy/ExxonMobil/TotalEnergies,onshore,operational,15.6,11.5,775000,2009-03-01,yes,South Hook LNG,2026-06-01,Milford Haven
+GB-DRAGON,United Kingdom,Europe,Dragon LNG,Shell/Ancala,onshore,operational,8.4,6.2,320000,2009-08-01,yes,Dragon LNG,2026-06-01,Milford Haven
+ES-BARCELONA,Spain,Europe,Barcelona,Enagás,onshore,operational,17.1,12.6,840000,1969-03-01,yes,Enagás,2026-06-01,Europe's oldest
+ES-CARTAGENA,Spain,Europe,Cartagena,Enagás,onshore,operational,11.8,8.7,587000,1989-01-01,yes,Enagás,2026-06-01,
+ES-SAGUNTO,Spain,Europe,Sagunto,Saggas/Enagás,onshore,operational,8.8,6.5,600000,2006-04-01,yes,Enagás,2026-06-01,
+ES-MUGARDOS,Spain,Europe,Mugardos,Reganosa,onshore,operational,3.6,2.6,300000,2007-06-01,yes,Reganosa,2026-06-01,Galicia
+ES-BILBAO,Spain,Europe,Bilbao (Bahía de Bizkaia),BBG,onshore,operational,7.0,5.1,300000,2003-08-01,yes,BBG,2026-06-01,
+ES-HUELVA,Spain,Europe,Huelva,Enagás,onshore,operational,11.8,8.7,610000,1988-08-01,yes,Enagás,2026-06-01,
+ES-ELMUSEL,Spain,Europe,El Musel,Enagás,onshore,operational,8.0,5.9,300000,2023-03-30,yes,Enagás,2026-06-01,Activated 2023 after years dormant; storage hub
+FR-MONTOIR,France,Europe,Montoir-de-Bretagne,Elengy,onshore,operational,10.0,7.4,360000,1980-03-01,yes,Elengy,2026-06-01,
+FR-FOSCAVAOU,France,Europe,Fos Cavaou,Elengy/TotalEnergies,onshore,operational,8.3,6.1,330000,2010-03-01,yes,Elengy,2026-06-01,
+FR-FOSTONKIN,France,Europe,Fos Tonkin,Elengy,onshore,operational,3.0,2.2,80000,1972-06-01,no,Elengy,2026-06-01,
+FR-DUNKIRK,France,Europe,Dunkirk LNG,Dunkerque LNG (Fluxys/Total),onshore,operational,13.0,9.6,570000,2017-01-01,yes,Dunkerque LNG,2026-06-01,
+NL-GATE,Netherlands,Europe,Gate Rotterdam,Vopak/Gasunie,onshore,operational,16.0,11.8,540000,2011-09-01,yes,Gate Terminal,2026-06-01,Expansion to 20+ bcm/y in progress
+NL-EEMSHAVEN-FSRU,Netherlands,Europe,Eemshaven LNG (EemsEnergy),Gasunie/Vopak,FSRU,operational,8.0,5.9,170000,2022-09-15,yes,Gasunie,2026-06-01,2 FSRUs; built in 6 months in response to 2022 crisis
+DE-WILHELMSHAVEN-FSRU,Germany,Europe,Wilhelmshaven 1 FSRU,DET/Uniper,FSRU,operational,7.5,5.5,170000,2022-12-21,no,Uniper/DET,2026-06-01,Germany's first LNG terminal
+DE-BRUNSBUTTEL-FSRU,Germany,Europe,Brunsbüttel FSRU,DET/RWE,FSRU,operational,3.5,2.6,170000,2023-01-20,no,DET,2026-06-01,
+DE-MUKRAN-FSRU,Germany,Europe,Mukran FSRU,DET/Deutsche ReGas,FSRU,operational,5.2,3.8,340000,2024-03-15,no,DET,2026-06-01,2 FSRUs at Rügen
+DE-STADE-ONSHORE,Germany,Europe,Stade,Hanseatic Energy Hub,onshore,construction,13.3,9.8,260000,2027-06-30,yes,HEH,2026-06-01,Replaces FSRU(s) when COD
+HR-KRK,Croatia,Europe,LNG Croatia (Krk),LNG Hrvatska,FSRU,operational,6.1,4.5,140000,2021-01-01,no,LNG Hrvatska,2026-06-01,Expanding to 8.4 BCm/y
+PL-SWINOUJSCIE,Poland,Europe,Świnoujście,Gaz-System,onshore,operational,8.3,6.1,320000,2015-12-12,yes,Gaz-System,2026-06-01,Expansion to ~10 BCm/y
+LT-KLAIPEDA,Lithuania,Europe,Klaipėda FSRU (Independence),KN Energies,FSRU,operational,4.0,2.9,170000,2014-10-27,no,KN Energies,2026-06-01,Baltic strategic terminal
+IT-PIOMBINO-FSRU,Italy,Europe,Piombino FSRU (Italis LNG),Snam,FSRU,operational,5.0,3.7,170000,2023-05-17,no,Snam,2026-06-01,Will relocate to Ravenna 2026
+IT-PANIGAGLIA,Italy,Europe,Panigaglia,Snam,onshore,operational,3.4,2.5,100000,1971-01-01,no,Snam,2026-06-01,
+IT-ROVIGO,Italy,Europe,Adriatic LNG (Rovigo),ExxonMobil/QatarEnergy/Snam,onshore,operational,9.0,6.6,250000,2009-10-01,yes,Adriatic LNG,2026-06-01,Offshore GBS
+GR-REVITHOUSSA,Greece,Europe,Revithoussa,DESFA,onshore,operational,7.0,5.1,225000,2000-02-01,yes,DESFA,2026-06-01,
+GR-ALEXANDROUPOLIS,Greece,Europe,Alexandroupolis FSRU,Gastrade,FSRU,operational,5.5,4.0,170000,2024-10-01,no,Gastrade,2026-06-01,Strategic for Balkans
+BE-ZEEBRUGGE,Belgium,Europe,Zeebrugge,Fluxys,onshore,operational,9.0,6.6,380000,1987-03-01,yes,Fluxys,2026-06-01,
+TR-DORTYOL-FSRU,Türkiye,Europe,Dörtyol FSRU,BOTAS,FSRU,operational,7.4,5.4,170000,2018-02-01,no,BOTAS,2026-06-01,
+TR-MARMARAEREGLISI,Türkiye,Europe,Marmara Ereğlisi,BOTAS,onshore,operational,8.2,6.0,255000,1994-01-01,no,BOTAS,2026-06-01,
+TW-YUNGAN,Taiwan,East Asia,Yung-An,CPC Corporation,onshore,operational,10.5,7.7,690000,1990-03-01,yes,CPC,2026-06-01,
+TW-TAICHUNG,Taiwan,East Asia,Taichung,CPC Corporation,onshore,operational,13.5,9.9,720000,2009-03-01,yes,CPC,2026-06-01,
+SG-SLNG,Singapore,SE Asia,Singapore LNG Terminal,SLNG Corp,onshore,operational,9.0,6.6,800000,2013-05-07,yes,SLNG,2026-06-01,Expansion to 11+ BCm/y
+PK-PORT-QASIM,Pakistan,South Asia,Port Qasim FSRU (Engro),Engro Elengy/ETPL,FSRU,operational,5.5,4.0,170000,2015-03-28,no,Engro,2026-06-01,
+PK-PAKISTAN-GASPORT,Pakistan,South Asia,Pakistan GasPort FSRU,PGPL,FSRU,operational,5.5,4.0,170000,2018-01-15,no,PGPL,2026-06-01,
+MX-MANZANILLO,Mexico,North America,Manzanillo,KMS LNG (Mitsui/Samsung/KOGAS),onshore,operational,4.4,3.2,300000,2012-03-01,no,KMS,2026-06-01,
+BR-GUANABARA,Brazil,Latin America,Guanabara Bay FSRU,Petrobras,FSRU,operational,11.0,8.1,170000,2014-01-01,no,Petrobras,2026-06-01,Replaced original FSRU
+BR-PECEM,Brazil,Latin America,Pecem FSRU,Petrobras,FSRU,operational,7.0,5.1,170000,2008-12-01,no,Petrobras,2026-06-01,Ceará
+AR-ESCOBAR,Argentina,Latin America,Escobar FSRU,Excelerate/Enarsa,FSRU,operational,11.0,8.1,150000,2011-06-01,no,Excelerate,2026-06-01,Seasonal high winter use

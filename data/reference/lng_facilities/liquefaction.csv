@@ -1,0 +1,109 @@
+facility_id,country,region,facility_name,operator,train,status,nameplate_mtpa,effective_mtpa,fid_date,start_date,ramp_up,feedgas,offtake_summary,source,last_updated,notes
+US-SABINEPASS-T1,USA,North America,Sabine Pass,Cheniere Energy,T1,operational,4.5,5.0,2010-08-01,2016-02-24,immediate,US shale (Haynesville/Permian),BG/Shell/CFE/GAIL/GNF/KOGAS portfolio,Cheniere 10-K + GIIGNL 2024,2026-06-01,Debottlenecked above nameplate
+US-SABINEPASS-T2,USA,North America,Sabine Pass,Cheniere Energy,T2,operational,4.5,5.0,2010-08-01,2016-09-15,immediate,US shale,Portfolio (long-term SPAs),Cheniere 10-K,2026-06-01,
+US-SABINEPASS-T3,USA,North America,Sabine Pass,Cheniere Energy,T3,operational,4.5,5.0,2010-08-01,2017-03-28,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-SABINEPASS-T4,USA,North America,Sabine Pass,Cheniere Energy,T4,operational,4.5,5.0,2010-08-01,2017-10-15,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-SABINEPASS-T5,USA,North America,Sabine Pass,Cheniere Energy,T5,operational,4.5,5.0,2014-06-30,2019-03-27,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-SABINEPASS-T6,USA,North America,Sabine Pass,Cheniere Energy,T6,operational,4.5,5.0,2019-06-01,2022-02-08,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-CORPUSCHRISTI-T1,USA,North America,Corpus Christi,Cheniere Energy,T1,operational,4.5,5.0,2015-05-13,2019-05-22,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-CORPUSCHRISTI-T2,USA,North America,Corpus Christi,Cheniere Energy,T2,operational,4.5,5.0,2015-05-13,2019-09-30,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-CORPUSCHRISTI-T3,USA,North America,Corpus Christi,Cheniere Energy,T3,operational,4.5,5.0,2018-05-09,2021-03-26,immediate,US shale,Portfolio,Cheniere 10-K,2026-06-01,
+US-CORPUSCHRISTI-CC3,USA,North America,Corpus Christi Stage 3,Cheniere Energy,Midscale T1-T7,commissioning,10.4,10.0,2022-06-22,2024-12-30,Y1:60%;Y2:90%;Y3:100%,US shale,Portfolio + JERA Equinor TotalEnergies,Cheniere press release Dec 2024,2026-06-01,7 midscale trains 1.49 MTPA each
+US-CAMERON-T1,USA,North America,Cameron LNG,Sempra Infrastructure,T1,operational,4.0,4.5,2014-08-12,2019-05-15,immediate,US Gulf,Mitsubishi/Mitsui/TotalEnergies/Sempra,Sempra 10-K,2026-06-01,
+US-CAMERON-T2,USA,North America,Cameron LNG,Sempra Infrastructure,T2,operational,4.0,4.5,2014-08-12,2020-02-14,immediate,US Gulf,Same,Sempra 10-K,2026-06-01,
+US-CAMERON-T3,USA,North America,Cameron LNG,Sempra Infrastructure,T3,operational,4.0,4.5,2014-08-12,2020-08-10,immediate,US Gulf,Same,Sempra 10-K,2026-06-01,
+US-FREEPORT-T1,USA,North America,Freeport LNG,Freeport LNG,T1,operational,5.1,5.0,2014-11-17,2019-09-03,immediate,US Gulf,Osaka Gas/JERA/BP/SK,Freeport LNG releases,2026-06-01,Recovered after 2022 fire
+US-FREEPORT-T2,USA,North America,Freeport LNG,Freeport LNG,T2,operational,5.1,5.0,2014-11-17,2020-01-23,immediate,US Gulf,Same,Freeport LNG,2026-06-01,
+US-FREEPORT-T3,USA,North America,Freeport LNG,Freeport LNG,T3,operational,5.1,5.0,2014-11-17,2020-05-19,immediate,US Gulf,Same,Freeport LNG,2026-06-01,
+US-COVEPOINT,USA,North America,Cove Point,Berkshire Hathaway Energy,single,operational,5.25,5.25,2014-03-31,2018-04-04,immediate,Marcellus,GAIL/Sumitomo (Tokyo Gas + Kansai Electric),Dominion (legacy) + BHE filings,2026-06-01,
+US-ELBA,USA,North America,Elba Island,Kinder Morgan,Modular T1-T10,operational,2.5,2.5,2016-12-07,2020-08-15,immediate,Southeast US,Shell offtake,KMI 10-K,2026-06-01,10 small modular trains of 0.25 MTPA each
+US-CALCASIEU,USA,North America,Calcasieu Pass,Venture Global LNG,Modular T1-T18,operational,10.0,10.0,2019-08-19,2022-03-01,immediate,US Gulf,Portfolio + Shell/BP/EDF/Galp/Repsol/PGNiG,VG SEC filings,2026-06-01,18 modular trains 0.55 MTPA each; commercial ops disputed by offtakers
+US-PLAQUEMINES-P1,USA,North America,Plaquemines LNG Phase 1,Venture Global LNG,Modular T1-T18 (Ph1),commissioning,10.0,10.0,2022-05-25,2024-12-26,Y1:60%;Y2:90%;Y3:100%,US Gulf,Shell/BP/PGNiG/EDF/CPC/Sinopec/ExxonMobil,VG press release Dec 2024,2026-06-01,Phase 1 commissioning; ramp through 2026
+US-PLAQUEMINES-P2,USA,North America,Plaquemines LNG Phase 2,Venture Global LNG,Modular Ph2,construction,10.0,10.0,2023-03-29,2026-06-30,Y1:60%;Y2:90%;Y3:100%,US Gulf,Same portfolio,VG releases 2024,2026-06-01,Expected COD 2026/2027
+US-GOLDENPASS-T1,USA,North America,Golden Pass LNG,QatarEnergy/ExxonMobil,T1,construction,5.2,5.2,2019-02-05,2026-09-30,Y1:60%;Y2:90%;Y3:100%,Pipeline gas,QatarEnergy/ExxonMobil offtake,Operator releases + EIA,2026-06-01,Bechtel Zachry settlement; delayed to late 2026
+US-GOLDENPASS-T2,USA,North America,Golden Pass LNG,QatarEnergy/ExxonMobil,T2,construction,5.2,5.2,2019-02-05,2027-03-31,Y1:60%;Y2:90%;Y3:100%,Pipeline gas,Same,Operator releases,2026-06-01,
+US-GOLDENPASS-T3,USA,North America,Golden Pass LNG,QatarEnergy/ExxonMobil,T3,construction,5.2,5.2,2019-02-05,2027-12-31,Y1:60%;Y2:90%;Y3:100%,Pipeline gas,Same,Operator releases,2026-06-01,
+US-RIOGRANDE-T1,USA,North America,Rio Grande LNG,NextDecade,T1,construction,5.4,5.4,2023-07-12,2027-09-30,Y1:50%;Y2:80%;Y3:100%,Permian,TotalEnergies/Shell/ENN/Galp/Itochu/Guangdong portfolio,NextDecade press release,2026-06-01,Phase 1 FID July 2023
+US-RIOGRANDE-T2,USA,North America,Rio Grande LNG,NextDecade,T2,construction,5.4,5.4,2023-07-12,2028-03-31,Y1:50%;Y2:80%;Y3:100%,Permian,Same,NextDecade,2026-06-01,
+US-RIOGRANDE-T3,USA,North America,Rio Grande LNG,NextDecade,T3,construction,5.4,5.4,2024-06-21,2028-12-31,Y1:50%;Y2:80%;Y3:100%,Permian,Same,NextDecade 2024 FID,2026-06-01,T3 FID 2024
+US-PORTARTHUR-T1,USA,North America,Port Arthur LNG Phase 1,Sempra Infrastructure,T1,construction,6.5,6.5,2023-03-20,2027-09-30,Y1:60%;Y2:90%;Y3:100%,US Gulf,KOGAS/ConocoPhillips/RWE/PKN Orlen/INEOS,Sempra press releases,2026-06-01,
+US-PORTARTHUR-T2,USA,North America,Port Arthur LNG Phase 1,Sempra Infrastructure,T2,construction,6.5,6.5,2023-03-20,2028-03-31,Y1:60%;Y2:90%;Y3:100%,US Gulf,Same,Sempra,2026-06-01,
+US-COSTAAZUL-T1,Mexico,North America,Energía Costa Azul,Sempra Infrastructure,T1,commissioning,3.25,3.25,2020-11-17,2026-03-31,Y1:80%;Y2:100%,US Permian via piped gas,Mitsui/TotalEnergies portfolio,Sempra Q4 2024,2026-06-01,Delayed from earlier 2025
+MX-SAGUARO-T1,Mexico,North America,Saguaro Energía LNG,Mexico Pacific,T1,construction,5.0,5.0,2024-09-04,2028-06-30,Y1:50%;Y2:80%;Y3:100%,Permian via pipeline,Shell/Woodside/ConocoPhillips/Zhejiang,MPL press release,2026-06-01,FID achieved 2024; Sonora coast
+CA-LNGCANADA-T1,Canada,North America,LNG Canada Phase 1,Shell/PetroChina/Mitsubishi/MOGAS/KOGAS/Petronas,T1,operational,7.0,7.0,2018-10-01,2025-06-29,Y1:80%;Y2:100%,Montney basin,JV offtake by shareholders,Shell press release June 2025,2026-06-01,First cargo June 2025
+CA-LNGCANADA-T2,Canada,North America,LNG Canada Phase 1,Shell/PetroChina/Mitsubishi/MOGAS/KOGAS/Petronas,T2,commissioning,7.0,7.0,2018-10-01,2025-12-31,Y1:80%;Y2:100%,Montney,Same JV,Shell releases,2026-06-01,
+CA-WOODFIBRE,Canada,North America,Woodfibre LNG,Pacific Energy/Enbridge,single,construction,2.1,2.1,2023-09-15,2027-12-31,immediate,Montney via pipeline,BP offtake,Woodfibre Press,2026-06-01,Squamish BC
+CA-CEDAR,Canada,North America,Cedar LNG,Pembina Pipeline/Haisla Nation,FLNG,construction,3.3,3.3,2024-06-25,2028-12-31,immediate,Western Canadian,ARC Energy/Pembina offtake,Pembina 2024 FID,2026-06-01,FLNG Kitimat
+QA-QATARENERGY-QG1,Qatar,MENA,Qatargas 1,QatarEnergy LNG,T1-T2,operational,6.6,6.6,1992-01-01,1997-12-15,immediate,North Field,JERA/Tokyo Gas/Chubu Electric (legacy long-term),QatarEnergy releases,2026-06-01,Two trains aggregated; longest-running Qatari LNG
+QA-QATARENERGY-QG2,Qatar,MENA,Qatargas 2,QatarEnergy LNG,T4-T5,operational,15.6,15.6,2003-01-01,2009-04-06,immediate,North Field,ExxonMobil/Total/Sinopec portfolio,QatarEnergy,2026-06-01,Two megatrains 7.8 MTPA each
+QA-QATARENERGY-QG3,Qatar,MENA,Qatargas 3,QatarEnergy LNG,T6,operational,7.8,7.8,2005-01-01,2010-11-15,immediate,North Field,ConocoPhillips/Mitsui,QatarEnergy,2026-06-01,Single megatrain
+QA-QATARENERGY-QG4,Qatar,MENA,Qatargas 4,QatarEnergy LNG,T7,operational,7.8,7.8,2005-01-01,2011-02-15,immediate,North Field,Shell,QatarEnergy,2026-06-01,
+QA-QATARENERGY-RG1,Qatar,MENA,RasGas 1,QatarEnergy LNG,T1-T2,operational,6.6,6.6,1996-01-01,1999-08-04,immediate,North Field,KOGAS/POSCO,QatarEnergy,2026-06-01,Merged into QatarEnergy LNG
+QA-QATARENERGY-RG2,Qatar,MENA,RasGas 2,QatarEnergy LNG,T3-T4-T5,operational,14.1,14.1,2002-01-01,2004-05-15,Y1-Y3 staggered start 2004-2007,North Field,Distrigas/Edison/India Petronet,QatarEnergy,2026-06-01,3 trains; mid-size
+QA-QATARENERGY-RG3,Qatar,MENA,RasGas 3,QatarEnergy LNG,T6-T7,operational,15.6,15.6,2005-01-01,2009-10-15,Trains 2009 and 2010,North Field,ExxonMobil offtake,QatarEnergy,2026-06-01,2 megatrains
+QA-QATARENERGY-NFE-T1,Qatar,MENA,North Field East,QatarEnergy/Shell/TotalEnergies/ExxonMobil/ConocoPhillips/Eni,T1,construction,8.0,8.0,2022-02-21,2026-12-31,Y1:60%;Y2:90%;Y3:100%,North Field,Sinopec/CNPC/Shell/TotalEnergies/ExxonMobil long-term SPAs,QatarEnergy/IEA,2026-06-01,NFE adds 32 MTPA across 4 trains
+QA-QATARENERGY-NFE-T2,Qatar,MENA,North Field East,QatarEnergy/Shell/TotalEnergies/ExxonMobil/ConocoPhillips/Eni,T2,construction,8.0,8.0,2022-02-21,2027-04-30,Y1:60%;Y2:90%;Y3:100%,North Field,Same,QatarEnergy,2026-06-01,
+QA-QATARENERGY-NFE-T3,Qatar,MENA,North Field East,QatarEnergy/Shell/TotalEnergies/ExxonMobil/ConocoPhillips/Eni,T3,construction,8.0,8.0,2022-02-21,2027-09-30,Y1:60%;Y2:90%;Y3:100%,North Field,Same,QatarEnergy,2026-06-01,
+QA-QATARENERGY-NFE-T4,Qatar,MENA,North Field East,QatarEnergy/Shell/TotalEnergies/ExxonMobil/ConocoPhillips/Eni,T4,construction,8.0,8.0,2022-02-21,2027-12-31,Y1:60%;Y2:90%;Y3:100%,North Field,Same,QatarEnergy,2026-06-01,
+QA-QATARENERGY-NFS-T1,Qatar,MENA,North Field South,QatarEnergy/Shell/TotalEnergies/ConocoPhillips,T1,construction,8.0,8.0,2023-10-23,2028-12-31,Y1:60%;Y2:90%;Y3:100%,North Field,Same JV partners; portfolio,QatarEnergy,2026-06-01,NFS Phase 2 of expansion
+QA-QATARENERGY-NFS-T2,Qatar,MENA,North Field South,QatarEnergy/Shell/TotalEnergies/ConocoPhillips,T2,construction,8.0,8.0,2023-10-23,2029-06-30,Y1:60%;Y2:90%;Y3:100%,North Field,Same,QatarEnergy,2026-06-01,
+AU-NWS-T1,Australia,Australia,North West Shelf,Woodside/BP/Chevron/Shell/MIMI,T1,operational,2.5,2.4,1980-01-01,1989-08-15,immediate,Carnarvon Basin,Japanese utilities portfolio,Woodside reports,2026-06-01,Original 1989 train
+AU-NWS-T2,Australia,Australia,North West Shelf,Woodside/BP/Chevron/Shell/MIMI,T2,operational,2.5,2.4,1980-01-01,1989-08-15,immediate,Carnarvon Basin,Same,Woodside,2026-06-01,
+AU-NWS-T3,Australia,Australia,North West Shelf,Woodside/BP/Chevron/Shell/MIMI,T3,operational,2.5,2.4,1989-01-01,1992-10-01,immediate,Carnarvon Basin,Same,Woodside,2026-06-01,
+AU-NWS-T4,Australia,Australia,North West Shelf,Woodside/BP/Chevron/Shell/MIMI,T4,operational,4.4,4.3,2001-01-01,2004-09-01,immediate,Carnarvon Basin,Same,Woodside,2026-06-01,
+AU-NWS-T5,Australia,Australia,North West Shelf,Woodside/BP/Chevron/Shell/MIMI,T5,operational,4.4,4.3,2005-01-01,2008-09-01,immediate,Carnarvon Basin (declining; future Browse/Scarborough backfill),Same,Woodside,2026-06-01,Feedgas constrained; backfill key
+AU-PLUTO-T1,Australia,Australia,Pluto LNG,Woodside,T1,operational,4.9,4.8,2007-07-20,2012-04-22,immediate,Pluto field,Tokyo Gas/Kansai Electric,Woodside,2026-06-01,
+AU-PLUTO-T2,Australia,Australia,Pluto LNG,Woodside,T2,construction,5.0,5.0,2021-11-22,2026-09-30,Y1:60%;Y2:90%;Y3:100%,Scarborough field,Portfolio,Woodside,2026-06-01,Scarborough-fed expansion
+AU-GORGON-T1,Australia,Australia,Gorgon LNG,Chevron/ExxonMobil/Shell,T1,operational,5.2,5.0,2009-09-14,2016-03-21,immediate,Gorgon/Jansz-Io,Long-term portfolio,Chevron,2026-06-01,Barrow Island
+AU-GORGON-T2,Australia,Australia,Gorgon LNG,Chevron/ExxonMobil/Shell,T2,operational,5.2,5.0,2009-09-14,2016-10-15,immediate,Same,Same,Chevron,2026-06-01,
+AU-GORGON-T3,Australia,Australia,Gorgon LNG,Chevron/ExxonMobil/Shell,T3,operational,5.2,5.0,2009-09-14,2017-03-01,immediate,Same,Same,Chevron,2026-06-01,
+AU-WHEATSTONE-T1,Australia,Australia,Wheatstone LNG,Chevron/Kuwait Foreign/Woodside/JERA/PE Wheatstone,T1,operational,4.45,4.4,2011-09-27,2017-10-09,immediate,Wheatstone/Iago,Long-term portfolio,Chevron,2026-06-01,
+AU-WHEATSTONE-T2,Australia,Australia,Wheatstone LNG,Chevron/Kuwait Foreign/Woodside/JERA/PE Wheatstone,T2,operational,4.45,4.4,2011-09-27,2018-06-22,immediate,Same,Same,Chevron,2026-06-01,
+AU-ICHTHYS-T1,Australia,Australia,Ichthys LNG,INPEX/TotalEnergies,T1,operational,4.45,4.4,2012-01-13,2018-10-09,immediate,Ichthys field,JERA/Tokyo Gas/Osaka Gas portfolio,INPEX,2026-06-01,Darwin
+AU-ICHTHYS-T2,Australia,Australia,Ichthys LNG,INPEX/TotalEnergies,T2,operational,4.45,4.4,2012-01-13,2018-12-30,immediate,Same,Same,INPEX,2026-06-01,
+AU-PRELUDE-FLNG,Australia,Australia,Prelude FLNG,Shell/INPEX/KOGAS/CPC,FLNG,operational,3.6,3.2,2011-05-20,2019-06-25,slow ramp,Prelude field,Shell offtake,Shell,2026-06-01,FLNG; ongoing operational issues
+AU-APLNG-T1,Australia,Australia,Australia Pacific LNG,ConocoPhillips/Origin/Sinopec,T1,operational,4.5,4.5,2011-07-28,2015-12-17,immediate,Queensland CSG,Sinopec/Kansai Electric,Origin/COP releases,2026-06-01,Curtis Island Gladstone
+AU-APLNG-T2,Australia,Australia,Australia Pacific LNG,ConocoPhillips/Origin/Sinopec,T2,operational,4.5,4.5,2011-07-28,2016-10-13,immediate,Queensland CSG,Sinopec,Same,2026-06-01,
+AU-GLNG-T1,Australia,Australia,Gladstone LNG,Santos/Petronas/Total/KOGAS,T1,operational,3.9,3.6,2010-12-13,2015-10-13,immediate,Queensland CSG,KOGAS/Petronas,Santos,2026-06-01,Curtis Island; feedgas constrained
+AU-GLNG-T2,Australia,Australia,Gladstone LNG,Santos/Petronas/Total/KOGAS,T2,operational,3.9,3.6,2010-12-13,2016-05-01,immediate,Same,Same,Santos,2026-06-01,
+AU-QCLNG-T1,Australia,Australia,Queensland Curtis LNG,Shell (BG legacy),T1,operational,4.0,4.0,2010-10-30,2014-12-31,immediate,Queensland CSG,Shell portfolio,Shell,2026-06-01,
+AU-QCLNG-T2,Australia,Australia,Queensland Curtis LNG,Shell (BG legacy),T2,operational,4.0,4.0,2010-10-30,2015-09-30,immediate,Same,Same,Shell,2026-06-01,
+RU-YAMAL-T1,Russia,Russia/Arctic,Yamal LNG,Novatek/TotalEnergies/CNPC/Silk Road Fund,T1,operational,5.5,5.0,2013-12-18,2017-12-08,immediate,South Tambey,Portfolio (shadow fleet redirection post-2022),Novatek,2026-06-01,
+RU-YAMAL-T2,Russia,Russia/Arctic,Yamal LNG,Novatek/TotalEnergies/CNPC/Silk Road Fund,T2,operational,5.5,5.0,2013-12-18,2018-08-01,immediate,Same,Same,Novatek,2026-06-01,
+RU-YAMAL-T3,Russia,Russia/Arctic,Yamal LNG,Novatek/TotalEnergies/CNPC/Silk Road Fund,T3,operational,5.5,5.0,2013-12-18,2018-12-11,immediate,Same,Same,Novatek,2026-06-01,
+RU-YAMAL-T4,Russia,Russia/Arctic,Yamal LNG,Novatek,T4 (Arctic Cascade),operational,0.9,0.9,2017-09-01,2021-05-15,immediate,South Tambey,Novatek portfolio,Novatek,2026-06-01,Domestic technology pilot
+RU-SAKHALIN2-T1,Russia,Russia/Arctic,Sakhalin Energy LNG,Gazprom/Mitsui/Mitsubishi,T1,operational,4.8,4.5,2003-05-22,2009-02-18,immediate,Sakhalin shelf,Japanese utilities (sanctions-exempted for now),Sakhalin Energy,2026-06-01,Shell exited 2022
+RU-SAKHALIN2-T2,Russia,Russia/Arctic,Sakhalin Energy LNG,Gazprom/Mitsui/Mitsubishi,T2,operational,4.8,4.5,2003-05-22,2009-06-16,immediate,Same,Same,Same,2026-06-01,
+RU-ARCTIC2-T1,Russia,Russia/Arctic,Arctic LNG-2,Novatek/CNPC/CNOOC/Mitsui/JOGMEC,T1,paused,6.6,2.0,2019-09-05,2024-01-15,severely constrained,Utrennoye field,No formal offtake post-sanctions,Reuters/Argus,2026-06-01,US sanctions Nov 2023; cargoes constrained
+RU-ARCTIC2-T2,Russia,Russia/Arctic,Arctic LNG-2,Novatek,T2,paused,6.6,0.0,2019-09-05,,deferred,Utrennoye,None,Argus,2026-06-01,Sanctioned; tow to site delayed
+RU-ARCTIC2-T3,Russia,Russia/Arctic,Arctic LNG-2,Novatek,T3,paused,6.6,0.0,2019-09-05,,deferred,Utrennoye,None,Argus,2026-06-01,T3 construction halted
+NG-NLNG-T1-T2,Nigeria,Sub-Saharan Africa,Nigeria LNG,NNPC/Shell/TotalEnergies/Eni,T1-T2,operational,6.5,6.0,1995-01-01,1999-10-09,immediate,Niger Delta,Long-term portfolio,NLNG,2026-06-01,Bonny Island
+NG-NLNG-T3,Nigeria,Sub-Saharan Africa,Nigeria LNG,NNPC/Shell/TotalEnergies/Eni,T3,operational,3.0,2.8,1999-01-01,2002-11-01,immediate,Niger Delta,Same,NLNG,2026-06-01,
+NG-NLNG-T4-T5,Nigeria,Sub-Saharan Africa,Nigeria LNG,NNPC/Shell/TotalEnergies/Eni,T4-T5,operational,8.4,7.8,2002-01-01,2005-11-01,immediate,Niger Delta,Same,NLNG,2026-06-01,Mid-2000s expansion
+NG-NLNG-T6,Nigeria,Sub-Saharan Africa,Nigeria LNG,NNPC/Shell/TotalEnergies/Eni,T6,operational,4.1,3.8,2004-01-01,2007-12-01,immediate,Niger Delta,Same,NLNG,2026-06-01,Feedgas curtailed by upstream security
+NG-NLNG-T7,Nigeria,Sub-Saharan Africa,Nigeria LNG,NNPC/Shell/TotalEnergies/Eni,T7,construction,8.0,7.5,2019-12-20,2026-12-31,Y1:60%;Y2:90%;Y3:100%,Niger Delta,Portfolio,NLNG,2026-06-01,Expansion train
+TT-ATLANTIC-T1,Trinidad and Tobago,Latin America,Atlantic LNG,Shell/BP/NGC/CIC,T1,mothballed,3.3,0.0,1995-01-01,1999-04-16,n/a,Trinidad,Legacy portfolio,Atlantic LNG,2026-06-01,Mothballed amid feedgas decline
+TT-ATLANTIC-T2,Trinidad and Tobago,Latin America,Atlantic LNG,Shell/BP/NGC/CIC,T2,operational,3.5,3.0,1995-01-01,2002-08-01,immediate,Trinidad,Same,Atlantic LNG,2026-06-01,Feedgas constrained
+TT-ATLANTIC-T3,Trinidad and Tobago,Latin America,Atlantic LNG,Shell/BP/NGC/CIC,T3,operational,3.5,3.0,1995-01-01,2003-04-25,immediate,Trinidad,Same,Atlantic LNG,2026-06-01,
+TT-ATLANTIC-T4,Trinidad and Tobago,Latin America,Atlantic LNG,Shell/BP/NGC/CIC,T4,operational,5.2,4.4,2002-01-01,2005-12-28,immediate,Trinidad,Same,Atlantic LNG,2026-06-01,Largest train; feedgas constrained
+EG-DAMIETTA,Egypt,MENA,Damietta LNG,SEGAS (Eni/EGAS/EGPC),T1,operational,5.0,4.0,1998-01-01,2005-01-01,immediate,Egyptian offshore (Zohr/WDDM),Portfolio,Eni,2026-06-01,Restarted 2021 after 8-year halt; intermittent
+EG-IDKU-T1,Egypt,MENA,Egyptian LNG (Idku),Shell/Petronas/EGAS/EGPC,T1,operational,3.6,3.0,2001-01-01,2005-05-13,immediate,WDDM/Egyptian offshore,Portfolio,Shell,2026-06-01,
+EG-IDKU-T2,Egypt,MENA,Egyptian LNG (Idku),Shell/Petronas/EGAS/EGPC,T2,operational,3.6,3.0,2001-01-01,2005-09-25,immediate,Same,Same,Shell,2026-06-01,Frequently curtailed by domestic demand
+MZ-CORALSUL,Mozambique,Sub-Saharan Africa,Coral Sul FLNG,Eni/ExxonMobil/CNPC/Galp/KOGAS/ENH,FLNG,operational,3.4,3.4,2017-06-01,2022-11-13,Y1:80%;Y2:100%,Coral South gas field,BP offtake long-term,Eni,2026-06-01,Ramped successfully despite security risks onshore
+MZ-MOZAMBIQUE-LNG-T1,Mozambique,Sub-Saharan Africa,Mozambique LNG,TotalEnergies/Mitsui/Bharat/ONGC/PTTEP,T1,paused,6.44,0.0,2019-06-18,2029-12-31,deferred,Area 1 (Golfinho-Atum),Asian utility portfolio,TotalEnergies,2026-06-01,FM declared 2021; Total signalled restart 2024-2025
+MZ-MOZAMBIQUE-LNG-T2,Mozambique,Sub-Saharan Africa,Mozambique LNG,TotalEnergies/Mitsui/Bharat/ONGC/PTTEP,T2,paused,6.44,0.0,2019-06-18,2030-06-30,deferred,Area 1,Same,TotalEnergies,2026-06-01,Insurgency risk near Palma
+NO-SNOHVIT,Norway,Europe,Snøhvit LNG (Hammerfest),Equinor,single,operational,4.3,4.0,2002-03-23,2007-09-01,immediate,Snøhvit field,Iberdrola/Total/RWE legacy,Equinor,2026-06-01,Hammerfest LNG; key European supply
+MR-SN-TORTUE,Mauritania,Sub-Saharan Africa,Tortue Ahmeyim FLNG Phase 1,BP/Kosmos/SMHPM/PETROSEN,FLNG,operational,2.5,2.0,2018-12-21,2025-02-15,Y1:60%;Y2:90%;Y3:100%,GTA field shared MR/SN,BP offtake,BP press release Feb 2025,2026-06-01,First cargo Feb 2025 after delays; Phase 2 study
+MY-MLNG-1,Malaysia,SE Asia,MLNG Bintulu Complex (legacy MLNG 1),Petronas,T1-T3,operational,8.4,7.5,1978-01-01,1983-12-31,immediate,Sarawak,Japanese long-term portfolio,Petronas,2026-06-01,Original MLNG; 3 trains
+MY-MLNG-2,Malaysia,SE Asia,MLNG Dua,Petronas,T4-T6,operational,9.6,9.0,1992-01-01,1995-12-31,immediate,Sarawak,Same,Petronas,2026-06-01,3 trains
+MY-MLNG-3,Malaysia,SE Asia,MLNG Tiga,Petronas,T7-T8,operational,7.7,7.4,1999-01-01,2003-04-01,immediate,Sarawak,Same,Petronas,2026-06-01,2 trains
+MY-MLNG-9,Malaysia,SE Asia,MLNG 9 (Train 9),Petronas,T9,operational,3.6,3.5,2010-11-15,2017-01-10,immediate,Sarawak,Portfolio,Petronas,2026-06-01,Single mega-train
+MY-PFLNG1,Malaysia,SE Asia,PFLNG Satu,Petronas,FLNG,operational,1.2,1.1,2012-06-21,2017-04-17,immediate,Kanowit field,Petronas,Petronas,2026-06-01,World's first FLNG
+MY-PFLNG2,Malaysia,SE Asia,PFLNG Dua,Petronas,FLNG,operational,1.5,1.4,2014-02-19,2021-02-21,immediate,Rotan field,Petronas,Petronas,2026-06-01,
+ID-TANGGUH-T1,Indonesia,SE Asia,Tangguh LNG,BP/MI Berau/CNOOC/Inpex,T1,operational,3.8,3.6,2005-03-01,2009-06-15,immediate,Wiriagar/Vorwata,Sempra Costa Azul + Korea + China,BP,2026-06-01,
+ID-TANGGUH-T2,Indonesia,SE Asia,Tangguh LNG,BP/MI Berau/CNOOC/Inpex,T2,operational,3.8,3.6,2005-03-01,2009-09-15,immediate,Same,Same,BP,2026-06-01,
+ID-TANGGUH-T3,Indonesia,SE Asia,Tangguh LNG,BP/MI Berau/CNOOC/Inpex,T3,operational,3.8,3.5,2016-07-01,2023-10-11,Y1:70%;Y2:90%,Same,PLN/portfolio,BP,2026-06-01,
+ID-BONTANG,Indonesia,SE Asia,Bontang LNG,Pertamina/Total/Vico/Chevron,T1-T8,operational,22.5,8.0,1970-01-01,1977-08-09,n/a,East Kalimantan (declining),Legacy Japanese portfolio + domestic,Pertamina,2026-06-01,Steep production decline; effective ~8 MTPA today
+ID-DONGGISENORO,Indonesia,SE Asia,Donggi-Senoro LNG,Mitsubishi/Pertamina/KOGAS/Medco,single,operational,2.0,1.9,2011-01-21,2015-07-23,immediate,Senoro/Matindok,Chubu/KOGAS,DSLNG,2026-06-01,
+PG-PNGLNG-T1,Papua New Guinea,Australia,PNG LNG,ExxonMobil/Oil Search/Santos/Kumul/MRDC/JX Nippon,T1,operational,4.2,4.0,2009-12-08,2014-04-25,immediate,PNG Highlands,JERA/Osaka Gas/Sinopec/CPC,ExxonMobil,2026-06-01,
+PG-PNGLNG-T2,Papua New Guinea,Australia,PNG LNG,ExxonMobil/Oil Search/Santos/Kumul/MRDC/JX Nippon,T2,operational,4.2,4.0,2009-12-08,2014-07-15,immediate,Same,Same,ExxonMobil,2026-06-01,Expansion ('P'nyang') project in study
