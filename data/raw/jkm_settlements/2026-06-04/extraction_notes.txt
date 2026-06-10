@@ -1,0 +1,24 @@
+Extraction notes — JKM settlements 2026-06-05
+Generated: 2026-06-05 (UTC)
+
+FLAG: Jan28 settlement = 12.808
+  Neighbors: Dec27 = 12.748, Feb28 = 12.423.
+  The Jan28 value is the local peak of the winter 27/28 hump but the spread
+  Jan28→Feb28 is -0.385 in a single month, which is large. Value is plausible
+  as a seasonal peak carry but visually confirm it is not 12.080 or 12.880
+  (decimal merge risk). Cross-check against your broker confirm or yesterday's
+  settlement before using for curve construction.
+
+NOTE: Screenshot overlap — Jun30 through Sep30 appear on both screenshot_01
+  and screenshot_02 with identical values. Rows attributed to screenshot_01
+  (first read); screenshot_02 overlap rows discarded to avoid duplicates.
+
+NOTE: "S" suffix on Last column for Sep26, Oct26, Nov26 in screenshot_01
+  indicates a settled (not live) print. Settlement column values read cleanly
+  for those rows; no issue.
+
+NOTE: Sep29 row highlighted blue in screenshot_01 (active cursor row on
+  broker screen). Value 8.788 reads clearly — no ambiguity.
+
+No values outside plausible range (all between 7.915 and 18.823 USD/MMBtu).
+No negative values, no values > 100.

@@ -1,0 +1,21 @@
+Extraction notes — JKM settlements 2026-06-08
+Extracted by: Finn (Data Retrieval Agent)
+Extracted UTC: 2026-06-09
+
+Source screenshots: screenshot_01.png (Bal Month Jul through Nov29), screenshot_02.png (Dec29 through May33)
+No strip overlap between screenshots — no deduplication required.
+
+CELL-LEVEL FLAGS: None. All settlement values read clearly. No 5/S, 8/B, or decimal-merge ambiguities detected.
+
+NOTE: screenshot_01.png shows Aug26 row highlighted (active selection) with a "s" suffix on the Last price (19.292 s). This is the broker screen's settled-print marker on the Last column — not a misread. The Settlement column value used is 19.147, which is distinct from Last and reads cleanly.
+
+DAY-ON-DAY SANITY (vs 2026-06-05, prior trading day — weekend gap):
+  Bal Month (Jul):  18.660 -> 19.250  (+0.590, +3.2%)  -- within normal range
+  Aug26:            18.527 -> 19.147  (+0.620, +3.3%)  -- within normal range
+  Jul26:            18.788 -> 18.992  (+0.204, +1.1%)  -- within normal range
+  Sep26:            18.172 -> 18.800  (+0.628, +3.5%)  -- within normal range
+  Dec26:            17.031 -> 17.583  (+0.552, +3.2%)  -- within normal range
+  Jan27:            16.704 -> 17.195  (+0.491, +2.9%)  -- within normal range
+
+No flags triggered (thresholds: >$1.50/MMBtu absolute OR >10% relative).
+Broad front-curve rally of ~$0.50-0.63/MMBtu across the prompt, consistent with a single weekend move.
