@@ -1,0 +1,22 @@
+Extraction notes — settlement date 2026-06-10
+Generated: 2026-06-11 (UTC)
+
+TRUNCATED ROWS (no settlement value visible — bottom of screenshot_02 cut off):
+- Sep33: Settlement cell not visible; row omitted from settlements.csv.
+- Oct33: Settlement cell not visible; row omitted from settlements.csv.
+Action required: if a third screenshot exists covering the tail of the curve, please provide it. Otherwise confirm Sep33/Oct33 can be omitted.
+
+OVERLAP CHECK:
+- Dec30 and Jan31 appear in both screenshot_01 and screenshot_02.
+  screenshot_01: Dec30=9.029, Jan31=9.010
+  screenshot_02: Dec30=9.029, Jan31=9.010
+  Values match — no conflict. screenshot_01 values retained.
+
+POTENTIAL MISREAD FLAGS (cross-checked against curve shape — none flagged):
+- No anomalous decimal merges detected.
+- No 5/S or 8/B ambiguities in Settlement column.
+- All values pass visual monotonicity / shape check (front >18, curve rolls down through 2027-2028, back of curve settles ~8-9 range).
+
+DAY-ON-DAY FLAGS (threshold: >$1.00 absolute or >7% relative vs 2026-06-09):
+- See main report for DoD table. No extraction-level flags raised here;
+  any DoD anomalies are curve-level and reported in the run summary.
