@@ -1,0 +1,984 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+% Packages (kept deliberately standard so the document compiles with a vanilla
+% TeX Live / MiKTeX installation -- pdflatex, two passes for the ToC/refs).
+% ---------------------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+% ---------------------------------------------------------------------------
+% Notation macros
+% ---------------------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Normal}{\mathcal{N}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\Tr}{^{\mathsf{T}}}              % transpose
+\newcommand{\ind}{\mathbf{1}}                % indicator
+\newcommand{\given}{\,\vert\,}
+\newcommand{\eqdef}{:=}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\state}{S}
+\newcommand{\obs}{r}
+\newcommand{\nstate}{K}
+\newcommand{\fwd}{\alpha}
+\newcommand{\bwd}{\beta}
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\title{\textbf{A Gaussian Hidden Markov Model for Market-Regime\\ Detection and Regime-Aware Position Sizing}\\[4pt]
+\large Mathematical specification of the \texttt{lng\_desk.hmm} module}
+\author{LNG Desk --- Quantitative Research}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give a complete, self-contained mathematical description of a three-state
+Gaussian hidden Markov model (HMM) used to classify daily asset returns into
+latent \emph{bear}, \emph{neutral} and \emph{bull} regimes, and to convert the
+inferred regime belief into a trading position. The document is written for a
+reader at the level of a final-year undergraduate in mathematics: we assume
+familiarity with probability, linear algebra, and multivariable calculus, but we
+derive every algorithm --- the forward--backward recursions, the Baum--Welch
+(EM) parameter estimator, the Viterbi decoder, online filtering, and the
+predictive moments --- from first principles. Each modelling choice in the
+implementation is stated explicitly and justified. The notation maps one-to-one
+onto the code in \texttt{src/lng\_desk/hmm/}; a symbol dictionary is given in
+Section~\ref{sec:symbols}.
+\end{abstract}
+
+\tableofcontents
+
+% ===========================================================================
+\section{Motivation and overview}
+% ===========================================================================
+
+Daily returns of a traded asset are notoriously hard to model with a single
+fixed distribution. Empirically, financial markets alternate between
+qualitatively different \emph{regimes}: calm trending periods with small
+positive drift and low volatility; directionless choppy periods; and stressed
+periods with negative drift and large volatility. These regimes are not labelled
+in the data --- we observe only the returns. This is precisely the setting of a
+\emph{hidden Markov model}: an unobserved (``hidden'') discrete state evolves as
+a Markov chain, and at each time the state emits an observation through a
+state-dependent probability law.
+
+We posit $\nstate=3$ hidden states with the interpretation
+\[
+\text{state }1=\text{bear},\qquad
+\text{state }2=\text{neutral},\qquad
+\text{state }3=\text{bull},
+\]
+and we assume that, \emph{conditional on the current state}, the daily return is
+Gaussian with a state-specific mean and variance. The bear state carries a
+negative mean and (typically) the largest variance; the neutral state a
+near-zero mean and small variance; the bull state a positive mean.
+
+The work splits into four classical problems, which we treat in turn:
+\begin{enumerate}[label=(\Roman*),leftmargin=2.2em]
+  \item \textbf{Evaluation.} Given parameters, compute the likelihood of an
+        observed return series. Solved by the \emph{forward} recursion
+        (Section~\ref{sec:fb}).
+  \item \textbf{Learning.} Estimate the parameters from data by maximum
+        likelihood. Solved by the \emph{Baum--Welch} algorithm, an instance of
+        Expectation--Maximisation (Section~\ref{sec:em}).
+  \item \textbf{Decoding.} Recover the most likely sequence of hidden states.
+        Solved by the \emph{Viterbi} algorithm (Section~\ref{sec:viterbi}).
+  \item \textbf{Prediction \& control.} Online, using only past data, compute
+        the current regime belief, predict tomorrow's return distribution, and
+        map it to a position (Sections~\ref{sec:filtering}--\ref{sec:trading}).
+\end{enumerate}
+
+% ===========================================================================
+\section{The probabilistic model}\label{sec:model}
+% ===========================================================================
+
+\subsection{Random variables and indices}
+
+Time is discrete, $t=1,2,\dots,T$, indexing trading days.\footnote{The
+implementation uses $0$-based indexing ($t=0,\dots,T-1$); this is immaterial to
+the mathematics.} At each $t$ there is
+\begin{itemize}[leftmargin=1.6em]
+  \item a \textbf{hidden state} $\state_t \in \{1,\dots,\nstate\}$, with
+        $\nstate=3$; and
+  \item an \textbf{observation} $\obs_t \in \R$, the day's return (e.g.\ the log
+        return $\obs_t=\log P_t-\log P_{t-1}$ of the underlying).
+\end{itemize}
+We write $\obs_{1:t} \eqdef (\obs_1,\dots,\obs_t)$ for a prefix of the
+observation sequence, and similarly $\state_{1:t}$.
+
+\subsection{Defining assumptions}
+
+The model is characterised by two conditional-independence assumptions.
+
+\begin{definition}[Markov property of the hidden chain]
+The state sequence $(\state_t)$ is a first-order, time-homogeneous Markov chain:
+\begin{equation}
+  P(\state_t \given \state_{1:t-1}) = P(\state_t\given \state_{t-1}),
+  \qquad t\ge 2,
+\end{equation}
+and this conditional law does not depend on $t$.
+\end{definition}
+
+\begin{definition}[Conditional independence of emissions]
+Given the entire state path, the observations are mutually independent and each
+$\obs_t$ depends only on the contemporaneous state $\state_t$:
+\begin{equation}
+  P(\obs_{1:T}\given \state_{1:T})
+  = \prod_{t=1}^{T} P(\obs_t \given \state_t).
+\end{equation}
+\end{definition}
+
+\subsection{Parameters}
+
+The model is fully specified by the triple $\theta=(\bm\pi, A, \{(\mu_k,\sigma_k^2)\})$:
+\begin{align}
+  \pi_i        &\eqdef P(\state_1=i),
+                 &&\text{initial distribution, } \bm\pi\in\R^{\nstate},\ \textstyle\sum_i\pi_i=1;\\
+  A_{ij}       &\eqdef P(\state_{t+1}=j\given \state_t=i),
+                 &&\text{transition matrix, } A\in\R^{\nstate\times\nstate},\ \textstyle\sum_j A_{ij}=1;\\
+  b_k(\obs)    &\eqdef \Normal(\obs;\mu_k,\sigma_k^2)
+                 = \frac{1}{\sqrt{2\pi\sigma_k^2}}
+                   \exp\!\Big(-\tfrac{(\obs-\mu_k)^2}{2\sigma_k^2}\Big),
+                 &&\text{emission density of state } k.
+\end{align}
+Here $A$ is \emph{row-stochastic}: row $i$ is the probability vector of the next
+state given current state $i$. We collect the emission parameters as
+$\mu=(\mu_1,\dots,\mu_\nstate)\in\R^{\nstate}$ and
+$\sigma^2=(\sigma_1^2,\dots,\sigma_\nstate^2)\in\R_{>0}^{\nstate}$.
+
+\subsection{The joint law and the likelihood}
+
+Combining the two assumptions, the joint density of a state path and the
+observations factorises along the chain:
+\begin{equation}\label{eq:joint}
+  P(\state_{1:T},\obs_{1:T}\given\theta)
+  = \pi_{\state_1}\, b_{\state_1}(\obs_1)
+    \prod_{t=2}^{T} A_{\state_{t-1}\state_t}\, b_{\state_t}(\obs_t).
+\end{equation}
+The quantity we ultimately want to maximise over $\theta$ is the
+\emph{(marginal) likelihood} of the observed data, obtained by summing
+\eqref{eq:joint} over all $\nstate^{T}$ possible state paths:
+\begin{equation}\label{eq:like}
+  L(\theta) \eqdef P(\obs_{1:T}\given\theta)
+  = \sum_{\state_{1:T}\in\{1,\dots,\nstate\}^T}
+    \pi_{\state_1} b_{\state_1}(\obs_1)
+    \prod_{t=2}^{T} A_{\state_{t-1}\state_t} b_{\state_t}(\obs_t).
+\end{equation}
+
+A direct evaluation of \eqref{eq:like} is hopeless: the number of paths grows as
+$\nstate^{T}$ (for one year of daily data, $3^{252}\approx 10^{120}$). The key
+structural insight --- exploited by every algorithm below --- is that the
+sum can be reorganised into $T$ steps of $O(\nstate^2)$ work each by
+\emph{dynamic programming}, because the chain only ever ``remembers'' the most
+recent state.
+
+% ===========================================================================
+\section{Evaluation: the forward--backward algorithm}\label{sec:fb}
+% ===========================================================================
+
+\subsection{Forward variables}
+
+\begin{definition}[Forward variable]
+For each $t$ and state $i$ define the joint density of the data seen so far and
+the current state,
+\begin{equation}
+  \fwd_t(i) \eqdef P(\obs_{1:t},\, \state_t=i \given \theta).
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Forward recursion]\label{prop:fwd}
+The forward variables satisfy
+\begin{align}
+  \fwd_1(i) &= \pi_i\, b_i(\obs_1), \label{eq:fwd-init}\\
+  \fwd_t(j) &= \Big(\sum_{i=1}^{\nstate} \fwd_{t-1}(i)\, A_{ij}\Big) b_j(\obs_t),
+              \qquad t=2,\dots,T,\label{eq:fwd-rec}
+\end{align}
+and the likelihood is recovered by marginalising the last step,
+\begin{equation}\label{eq:like-from-fwd}
+  L(\theta) = \sum_{i=1}^{\nstate} \fwd_T(i).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The initialisation \eqref{eq:fwd-init} is the definition at $t=1$ using
+$P(\obs_1,\state_1=i)=P(\state_1=i)P(\obs_1\given\state_1=i)$. For the recursion,
+condition on the previous state and use the law of total probability:
+\begin{align*}
+  \fwd_t(j)
+  &= P(\obs_{1:t}, \state_t=j)
+   = \sum_{i} P(\obs_{1:t}, \state_{t-1}=i, \state_t=j)\\
+  &= \sum_{i} P(\obs_{1:t-1},\state_{t-1}=i)\,
+             P(\state_t=j\given \state_{t-1}=i)\,
+             P(\obs_t\given \state_t=j),
+\end{align*}
+where the factorisation uses the Markov property (the transition to $j$ depends
+only on $i$) and conditional independence of emissions ($\obs_t$ depends only on
+$\state_t=j$, and is independent of $\obs_{1:t-1}$ given $\state_t$). Recognising
+the three factors as $\fwd_{t-1}(i)$, $A_{ij}$ and $b_j(\obs_t)$ gives
+\eqref{eq:fwd-rec}. Finally \eqref{eq:like-from-fwd} is
+$\sum_i P(\obs_{1:T},\state_T=i)=P(\obs_{1:T})$.
+\end{proof}
+
+Each step \eqref{eq:fwd-rec} costs $O(\nstate^2)$, so the whole forward pass is
+$O(\nstate^2 T)$ --- linear in the length of the series. This single fact is what
+makes HMMs tractable.
+
+\subsection{Backward variables}
+
+To learn parameters we also need the \emph{posterior} distribution of the states
+given \emph{all} the data. This requires a complementary recursion that
+propagates information backwards in time. The recursions below all rest on a
+single conditional-independence fact, which we isolate once.
+
+\begin{lemma}[Markov blanket]\label{lem:blanket}
+Under the two model assumptions of Section~\ref{sec:model}, the future is
+independent of the past given the present state: for every $t$,
+\begin{equation}\label{eq:blanket}
+  \big(\obs_{t+1:T},\state_{t+1:T}\big) \ \perp\ \big(\obs_{1:t-1},\state_{1:t-1}\big)
+  \quad\text{given } \state_t .
+\end{equation}
+In particular $P(\obs_{t+1:T}\given\state_t,\obs_{1:t})=P(\obs_{t+1:T}\given\state_t)$.
+\end{lemma}
+
+\begin{proof}
+Fix $\state_t=i$. The joint factorisation \eqref{eq:joint} splits as a product
+of a ``past'' block involving only $(\state_{1:t},\obs_{1:t})$ and a ``future''
+block $\prod_{u>t} A_{\state_{u-1}\state_u} b_{\state_u}(\obs_u)$ that, given
+$\state_t$, involves only indices $u>t$. Two functions of disjoint coordinate
+blocks that share only the conditioning variable $\state_t$ are conditionally
+independent given $\state_t$; summing the past block over $\state_{1:t-1}$ and
+the future block over $\state_{t+1:T}$ leaves \eqref{eq:blanket}. The displayed
+consequence is the special case obtained by marginalising the future states.
+\end{proof}
+
+\begin{definition}[Backward variable]
+\begin{equation}
+  \bwd_t(i) \eqdef P(\obs_{t+1:T}\given \state_t=i,\theta),
+\end{equation}
+the likelihood of the \emph{future} observations given the present state, with
+the convention $\bwd_T(i)=1$ for all $i$ (there is no future to condition).
+\end{definition}
+
+\begin{proposition}[Backward recursion]\label{prop:bwd}
+\begin{align}
+  \bwd_T(i) &= 1, \\
+  \bwd_t(i) &= \sum_{j=1}^{\nstate} A_{ij}\, b_j(\obs_{t+1})\, \bwd_{t+1}(j),
+              \qquad t=T-1,\dots,1.\label{eq:bwd-rec}
+\end{align}
+\end{proposition}
+
+\begin{proof}
+Condition on the next state $j$:
+\[
+  \bwd_t(i) = \sum_j P(\state_{t+1}=j,\obs_{t+1},\obs_{t+2:T}\given\state_t=i).
+\]
+Factor the summand using the Markov property and conditional independence:
+$P(\state_{t+1}=j\given\state_t=i)=A_{ij}$, then
+$P(\obs_{t+1}\given\state_{t+1}=j)=b_j(\obs_{t+1})$, and finally
+$P(\obs_{t+2:T}\given\state_{t+1}=j,\state_t=i,\obs_{t+1})
+=P(\obs_{t+2:T}\given\state_{t+1}=j)=\bwd_{t+1}(j)$ by the Markov-blanket
+Lemma~\ref{lem:blanket} (the future beyond $t+1$ is independent of $\state_t$ and
+$\obs_{t+1}$ given $\state_{t+1}$). This is \eqref{eq:bwd-rec}.
+\end{proof}
+
+\subsection{Posterior marginals and pairwise posteriors}
+
+The forward and backward variables combine to give the two posterior quantities
+that drive learning. Throughout, $L=L(\theta)=\sum_i \fwd_T(i)$.
+
+\begin{proposition}[Smoothed state posterior]\label{prop:gamma}
+The posterior probability of being in state $i$ at time $t$ given all data is
+\begin{equation}\label{eq:gamma}
+  \gamma_t(i)\eqdef P(\state_t=i\given\obs_{1:T},\theta)
+  = \frac{\fwd_t(i)\,\bwd_t(i)}{L}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+By definition of the forward and backward variables and the Markov-blanket
+Lemma~\ref{lem:blanket}, which gives
+$P(\obs_{t+1:T}\given\state_t=i,\obs_{1:t})=P(\obs_{t+1:T}\given\state_t=i)$,
+\[
+  \fwd_t(i)\bwd_t(i)
+  = P(\obs_{1:t},\state_t=i)\,P(\obs_{t+1:T}\given\state_t=i)
+  = P(\obs_{1:t},\state_t=i)\,P(\obs_{t+1:T}\given\state_t=i,\obs_{1:t})
+  = P(\obs_{1:T},\state_t=i).
+\]
+Dividing by $L=P(\obs_{1:T})$ gives the conditional \eqref{eq:gamma}.
+\end{proof}
+
+\begin{proposition}[Pairwise (transition) posterior]\label{prop:xi}
+The joint posterior of consecutive states is, for $t=1,\dots,T-1$,
+\begin{equation}\label{eq:xi}
+  \xi_t(i,j)\eqdef P(\state_t=i,\state_{t+1}=j\given\obs_{1:T},\theta)
+  = \frac{\fwd_t(i)\,A_{ij}\,b_j(\obs_{t+1})\,\bwd_{t+1}(j)}{L}.
+\end{equation}
+Consistency holds: $\sum_{j}\xi_t(i,j)=\gamma_t(i)$.
+\end{proposition}
+
+\begin{proof}
+Analogous to Proposition~\ref{prop:gamma}, splitting the path at the
+$t\!\to\!t\!+\!1$ transition and using Lemma~\ref{lem:blanket} to detach the
+future $\obs_{t+1:T}$ from the past given $\state_{t+1}$:
+$P(\obs_{1:T},\state_t=i,\state_{t+1}=j)
+=\fwd_t(i)A_{ij}b_j(\obs_{t+1})\bwd_{t+1}(j)$, then normalise by $L$.
+\end{proof}
+
+\subsection{Numerical realisation: the log domain}\label{sec:logspace}
+
+The forward variables are products of many densities and probabilities; they
+decay to zero faster than double-precision floating point can represent
+(underflow) within a few hundred steps. The implementation therefore carries
+\emph{logarithms} of all quantities and replaces sums of probabilities by the
+\emph{log-sum-exp} operation.
+
+\begin{definition}[Log-sum-exp]
+For $x=(x_1,\dots,x_n)\in\R^n$,
+\begin{equation}\label{eq:lse}
+  \operatorname{LSE}(x) \eqdef \log\sum_{k=1}^n e^{x_k}
+  = m + \log\sum_{k=1}^n e^{x_k-m},
+  \qquad m \eqdef \max_k x_k .
+\end{equation}
+\end{definition}
+The right-hand identity is the numerically stable form actually evaluated: after
+subtracting the maximum $m$, the largest exponent is $0$, so $e^{x_k-m}\in(0,1]$
+and no term overflows; at least one term equals $1$, so the sum is bounded below
+by $1$ and its logarithm never underflows (individual small terms may still round
+to $0$, harmlessly --- it is the \emph{sum} that is protected). With $\ell\fwd_t(i)\eqdef\log\fwd_t(i)$ etc., the forward
+recursion \eqref{eq:fwd-rec} becomes
+\begin{equation}
+  \ell\fwd_t(j) = \log b_j(\obs_t)
+  + \operatorname{LSE}_i\!\big(\ell\fwd_{t-1}(i)+\log A_{ij}\big),
+\end{equation}
+and the Gaussian log-density is computed directly,
+\begin{equation}
+  \log b_k(\obs_t) = -\tfrac12\Big(\log(2\pi)+\log\sigma_k^2
+                     + \frac{(\obs_t-\mu_k)^2}{\sigma_k^2}\Big),
+\end{equation}
+never as the logarithm of an exponentiated quantity. The smoothed posterior in
+log form reads $\log\gamma_t(i)=\ell\fwd_t(i)+\ell\bwd_t(i)-\ell L$ with
+$\ell L=\operatorname{LSE}_i \ell\fwd_T(i)$.
+
+% ===========================================================================
+\section{Learning: Baum--Welch as Expectation--Maximisation}\label{sec:em}
+% ===========================================================================
+
+We now estimate $\theta$ by (local) maximum likelihood,
+$\hat\theta=\argmax_\theta \log L(\theta)$. Because the states are unobserved,
+the log-likelihood $\log L(\theta)=\log\sum_{\state_{1:T}} P(\state_{1:T},\obs_{1:T}\given\theta)$
+contains a logarithm of a sum and has no closed-form maximiser. The
+Baum--Welch algorithm is the specialisation to HMMs of the
+Expectation--Maximisation (EM) algorithm, which sidesteps this by iterating two
+steps that are each tractable.
+
+\subsection{The EM principle}\label{sec:em-principle}
+
+Let $s\eqdef\state_{1:T}$ denote the latent path and $r\eqdef\obs_{1:T}$ the
+data. For \emph{any} distribution $q$ over the latent paths, write the
+\emph{evidence lower bound} (ELBO)
+\begin{equation}\label{eq:elbo}
+  \mathcal{F}(q,\theta) \eqdef \sum_{s} q(s)\,\log\frac{P(s,r\given\theta)}{q(s)} .
+\end{equation}
+A one-line manipulation gives the central identity
+\begin{equation}\label{eq:em-identity}
+  \log L(\theta) = \mathcal{F}(q,\theta) + \KL\!\big(q \,\big\|\, P(\cdot\given r,\theta)\big),
+\end{equation}
+where $\KL(q\|p)=\sum_s q(s)\log\frac{q(s)}{p(s)}\ge 0$ is the
+Kullback--Leibler divergence, equal to zero iff $q=p$. Equation
+\eqref{eq:em-identity} holds because
+$\KL(q\|P(\cdot\given r,\theta))=\sum_s q(s)\log\frac{q(s)P(r\given\theta)}{P(s,r\given\theta)}
+=\log L(\theta)-\mathcal F(q,\theta)$, using $P(s\given r,\theta)=P(s,r\given\theta)/P(r\given\theta)$.
+
+EM exploits \eqref{eq:em-identity} by coordinate ascent on $\mathcal F$:
+\begin{description}[leftmargin=2.2em,style=nextline]
+  \item[E-step] At the current estimate $\theta^{(n)}$, maximise $\mathcal F$ over
+        $q$. Since $\log L(\theta^{(n)})$ is fixed, \eqref{eq:em-identity} is
+        maximised by driving the KL term to zero, i.e.\ by choosing
+        \[
+          q^{(n)}(s) = P(s\given r,\theta^{(n)}),
+        \]
+        the smoothed posterior over paths --- which the forward--backward
+        algorithm gives us through its marginals $\gamma,\xi$.
+  \item[M-step] Maximise $\mathcal F(q^{(n)},\theta)$ over $\theta$. Expanding the
+        ELBO \eqref{eq:elbo} as a sum splits it into a $\theta$-dependent and a
+        $\theta$-independent piece,
+        \begin{equation}\label{eq:F-split}
+          \mathcal F(q,\theta)
+          = \underbrace{\sum_s q(s)\log P(s,r\given\theta)}_{\displaystyle Q(\theta\,\mid\,\theta^{(n)})}
+          \;\underbrace{-\sum_s q(s)\log q(s)}_{\displaystyle H(q),\ \text{independent of }\theta},
+        \end{equation}
+        so maximising $\mathcal F(q^{(n)},\theta)$ over $\theta$ is equivalent to
+        maximising the \emph{expected complete-data log-likelihood}
+        \begin{equation}\label{eq:Qfun}
+          Q(\theta\given\theta^{(n)}) \eqdef \E_{s\sim q^{(n)}}\!\big[\log P(s,r\given\theta)\big].
+        \end{equation}
+\end{description}
+
+\begin{proposition}[Monotonicity]\label{prop:monotone}
+The EM iterates never decrease the likelihood:
+$\log L(\theta^{(n+1)})\ge \log L(\theta^{(n)})$.
+\end{proposition}
+
+\begin{proof}
+With $q^{(n)}=P(\cdot\given r,\theta^{(n)})$ the KL term in
+\eqref{eq:em-identity} vanishes, so
+$\log L(\theta^{(n)})=\mathcal F(q^{(n)},\theta^{(n)})$. The M-step gives
+$\mathcal F(q^{(n)},\theta^{(n+1)})\ge \mathcal F(q^{(n)},\theta^{(n)})$. Finally
+\eqref{eq:em-identity} at $\theta^{(n+1)}$ with the \emph{same} $q^{(n)}$ reads
+$\log L(\theta^{(n+1)})=\mathcal F(q^{(n)},\theta^{(n+1)})+\KL(\cdots)\ge
+\mathcal F(q^{(n)},\theta^{(n+1)})\ge \log L(\theta^{(n)})$, the last KL being
+$\ge 0$. Chaining the inequalities proves the claim.
+\end{proof}
+
+Proposition~\ref{prop:monotone} guarantees convergence of the likelihood
+sequence (it is non-decreasing and, for our bounded-below variance model with a
+floor, bounded above); it does \emph{not} guarantee convergence to the global
+maximum. This is why we use multiple restarts (Section~\ref{sec:decisions}).
+
+\subsection{The expected complete-data log-likelihood for an HMM}
+
+Taking the logarithm of the factorised joint \eqref{eq:joint} turns products
+into sums and exposes the parameters linearly through indicator functions:
+\begin{equation}
+  \log P(s,r\given\theta)
+  = \sum_{i}\ind\{\state_1=i\}\log\pi_i
+  + \sum_{t=2}^{T}\sum_{i,j}\ind\{\state_{t-1}=i,\state_t=j\}\log A_{ij}
+  + \sum_{t=1}^{T}\sum_{i}\ind\{\state_t=i\}\log b_i(\obs_t).
+\end{equation}
+Taking the expectation under $q^{(n)}=P(\cdot\given r,\theta^{(n)})$ and using
+$\E[\ind\{\state_t=i\}]=\gamma_t(i)$ and
+$\E[\ind\{\state_{t-1}=i,\state_t=j\}]=\xi_{t-1}(i,j)$ gives a transition term
+$\sum_{t=2}^{T}\xi_{t-1}(i,j)\log A_{ij}$; reindexing $t\mapsto t-1$ so the sum
+runs over the $T-1$ transitions $t=1,\dots,T-1$ (the range on which $\xi_t$ is
+defined, \eqref{eq:xi}) yields
+\begin{equation}\label{eq:Q-hmm}
+  Q(\theta\given\theta^{(n)})
+  = \underbrace{\sum_{i}\gamma_1(i)\log\pi_i}_{\text{initial}}
+  + \underbrace{\sum_{t=1}^{T-1}\sum_{i,j}\xi_t(i,j)\log A_{ij}}_{\text{transitions}}
+  + \underbrace{\sum_{t=1}^{T}\sum_{i}\gamma_t(i)\log b_i(\obs_t)}_{\text{emissions}} .
+\end{equation}
+Crucially, the three groups of parameters $(\bm\pi)$, $(A)$, $(\mu,\sigma^2)$
+appear in \emph{separate} additive terms, so the M-step decouples into three
+independent maximisations.
+
+\subsection{The M-step updates}
+
+\paragraph{Initial distribution.}
+Maximise $\sum_i\gamma_1(i)\log\pi_i$ subject to $\sum_i\pi_i=1$. With Lagrange
+multiplier $\lambda$, the stationarity condition
+$\partial_{\pi_i}\!\big[\sum_i\gamma_1(i)\log\pi_i+\lambda(1-\sum_i\pi_i)\big]=0$
+gives $\gamma_1(i)/\pi_i=\lambda$, hence $\pi_i=\gamma_1(i)/\lambda$ with
+$\lambda=\sum_k\gamma_1(k)$ fixed by the constraint. Since $\gamma_1(\cdot)$ is
+itself a probability distribution over the states at $t=1$ (Proposition~\ref{prop:gamma}),
+$\sum_k\gamma_1(k)=1$, so $\lambda=1$ and
+\begin{equation}\label{eq:mstep-pi}
+  \boxed{\;\pi_i^{(n+1)} = \gamma_1(i).\;}
+\end{equation}
+(The implementation divides by $\sum_k\gamma_1(k)$ explicitly rather than
+relying on the exact identity, which is more robust to floating-point error;
+the two agree because the sum is $1$.)
+
+\paragraph{Transition matrix.}
+For each row $i$, maximise $\sum_j\big(\sum_t\xi_t(i,j)\big)\log A_{ij}$ subject to
+$\sum_j A_{ij}=1$. The identical Lagrange argument gives
+$A_{ij}\propto\sum_t\xi_t(i,j)$, and using $\sum_j\xi_t(i,j)=\gamma_t(i)$ to
+normalise,
+\begin{equation}\label{eq:mstep-A}
+  \boxed{\;A_{ij}^{(n+1)}
+  = \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)}.\;}
+\end{equation}
+The numerator is the expected number of $i\!\to\!j$ transitions; the denominator
+is the expected number of visits to $i$ from which a transition occurs --- the
+estimator is exactly an ``expected count'' ratio.
+
+\paragraph{Gaussian emissions.}
+Only the emission term of \eqref{eq:Q-hmm} involves $(\mu_i,\sigma_i^2)$:
+\[
+  Q_i(\mu_i,\sigma_i^2)
+  = \sum_{t=1}^{T}\gamma_t(i)\Big(-\tfrac12\log(2\pi)
+    -\tfrac12\log\sigma_i^2 - \frac{(\obs_t-\mu_i)^2}{2\sigma_i^2}\Big).
+\]
+Setting $\partial Q_i/\partial\mu_i=0$:
+$\sum_t\gamma_t(i)(\obs_t-\mu_i)/\sigma_i^2=0\Rightarrow$
+\begin{equation}\label{eq:mstep-mu}
+  \boxed{\;\mu_i^{(n+1)} = \frac{\sum_{t}\gamma_t(i)\,\obs_t}{\sum_{t}\gamma_t(i)}.\;}
+\end{equation}
+Setting $\partial Q_i/\partial\sigma_i^2=0$:
+$\sum_t\gamma_t(i)\big(-\tfrac{1}{2\sigma_i^2}+\tfrac{(\obs_t-\mu_i)^2}{2\sigma_i^4}\big)=0\Rightarrow$
+\begin{equation}\label{eq:mstep-sig}
+  \boxed{\;(\sigma_i^2)^{(n+1)}
+  = \frac{\sum_{t}\gamma_t(i)\,(\obs_t-\mu_i^{(n+1)})^2}{\sum_{t}\gamma_t(i)}.\;}
+\end{equation}
+These are exactly \emph{responsibility-weighted} sample mean and variance, with
+the soft assignment $\gamma_t(i)$ playing the role of a fractional membership of
+observation $t$ in state $i$. Writing $N_i\eqdef\sum_t\gamma_t(i)$ for the
+expected occupancy of state $i$, the updates are
+$\mu_i=N_i^{-1}\sum_t\gamma_t(i)\obs_t$ and
+$\sigma_i^2=N_i^{-1}\sum_t\gamma_t(i)(\obs_t-\mu_i)^2$.
+
+\subsection{The algorithm}
+
+\begin{quote}\itshape
+\textbf{Baum--Welch (one EM sweep).} Given $\theta^{(n)}$:
+\begin{enumerate}[label=\arabic*.,leftmargin=2em]
+  \item \textbf{E-step.} Run the forward (\ref{prop:fwd}) and backward
+        (\ref{prop:bwd}) recursions in log-space; form $\gamma_t(i)$
+        (\ref{prop:gamma}) and $\xi_t(i,j)$ (\ref{prop:xi}); record
+        $\log L(\theta^{(n)})$.
+  \item \textbf{M-step.} Update $\bm\pi,A,\mu,\sigma^2$ by
+        \eqref{eq:mstep-pi}--\eqref{eq:mstep-sig}; apply the variance floor and
+        any sign/zero constraints (Section~\ref{sec:decisions}).
+  \item \textbf{Convergence.} Stop when
+        $\log L(\theta^{(n+1)})-\log L(\theta^{(n)}) < \texttt{tol}$ or the
+        iteration cap is reached.
+\end{enumerate}
+\end{quote}
+One sweep costs $O(\nstate^2 T)$, dominated by the forward--backward pass.
+
+% ===========================================================================
+\section{Modelling decisions and their justification}\label{sec:decisions}
+% ===========================================================================
+
+The bare EM recursions above are textbook. What makes the estimator usable on
+real return data is a set of deliberate choices, each addressing a concrete
+failure mode.
+
+\subsection{Why three Gaussian states}
+Three states is the smallest number that can encode the qualitative trichotomy
+(\emph{down / sideways / up}) that practitioners reason about, while keeping the
+parameter count low ($\nstate^2-\nstate=6$ free transition probabilities,
+$2\nstate=6$ emission parameters, $\nstate-1=2$ initial probabilities). A
+Gaussian emission is the maximum-entropy choice given a state-specific mean and
+variance, and it makes the M-step closed-form. Its known weakness --- thin tails
+relative to real returns --- is discussed in Section~\ref{sec:extensions}.
+
+\subsection{The variance floor: avoiding the likelihood singularity}\label{sec:floor}
+The Gaussian-emission likelihood is \emph{unbounded above}. If a state's mean
+$\mu_i$ coincides with a single observation $\obs_\tau$ and its variance
+$\sigma_i^2\to 0$, then $b_i(\obs_\tau)=\big(2\pi\sigma_i^2\big)^{-1/2}\to\infty$.
+The term of the path-sum \eqref{eq:like} in which $\state_\tau=i$ then contains
+this diverging factor while all its remaining factors (the transitions and the
+other emissions $b_{\state_u}(\obs_u)$, $u\ne\tau$) stay bounded below by a
+positive constant as $\sigma_i^2\to0$; hence that single term, and with it
+$L(\theta)$, diverges to $+\infty$. EM can march toward such a degenerate spike,
+``explaining'' one day perfectly and collapsing the state. We forbid this by
+flooring the variance after each M-step,
+\begin{equation}
+  \sigma_i^2 \leftarrow \max\!\big(\sigma_i^2,\ \varepsilon\big),
+  \qquad \varepsilon = \texttt{var\_floor} \;(=10^{-8}\text{ by default}),
+\end{equation}
+which keeps every emission density bounded and the optimisation well-posed.
+
+\subsection{Non-convexity and multiple restarts}
+The log-likelihood surface is multimodal; EM converges only to a local maximum
+(Proposition~\ref{prop:monotone}), and which one depends on the initial
+$\theta^{(0)}$. We therefore run \texttt{n\_restarts} independent fits from
+randomised initialisations and keep the one with the highest $\log L$. Means are
+initialised by spreading them across empirical return quantiles (so distinct
+restarts explore distinct mode assignments), variances around the sample
+variance, and the transition matrix is initialised \emph{sticky}.
+
+\subsection{Sticky transition initialisation}
+Financial regimes persist for weeks or months, not single days. We initialise
+$A$ with large diagonal mass,
+\begin{equation}
+  A^{(0)}_{ii}=0.9,\qquad A^{(0)}_{ij}=\frac{0.1}{\nstate-1}\ (j\ne i),
+\end{equation}
+encoding the prior belief that ``tomorrow's regime is probably today's''. This
+both speeds convergence and steers EM away from implausible rapidly-switching
+solutions.
+
+\subsection{Identifiability: breaking label-switching by ordering}\label{sec:label}
+The likelihood \eqref{eq:like} is \emph{invariant} under any permutation of the
+state labels: relabelling states and permuting $(\bm\pi,A,\mu,\sigma^2)$
+accordingly leaves $L$ unchanged. Hence there are $\nstate!$ equivalent global
+modes, and ``state 1'' from one fit need not be the bear state. We remove this
+ambiguity by adopting the canonical ordering
+\begin{equation}
+  \mu_1 \le \mu_2 \le \mu_3,
+\end{equation}
+i.e.\ after fitting we sort the states by mean ascending and permute all
+parameters (and $A$ by the corresponding symmetric reindexing
+$A\mapsto A[\sigma,\sigma]$). Index $1$ is then always \emph{bear} (lowest mean),
+$2$ \emph{neutral}, $3$ \emph{bull}. This is what lets downstream code refer to
+\texttt{P(bull)} unambiguously.
+
+The ordering breaks the symmetry \emph{uniquely} precisely when the means are
+distinct, $\mu_1<\mu_2<\mu_3$, which holds almost surely for continuous return
+data. On the measure-zero event of an exact tie $\mu_i=\mu_j$ (with
+$\sigma_i^2\ne\sigma_j^2$) the ordering by mean alone is not unique; the
+implementation then breaks the residual tie by original index
+(\texttt{np.argsort}), a deterministic but arbitrary convention. A fully
+canonical rule would sort lexicographically on $(\mu_k,\sigma_k^2)$.
+
+\subsection{Optional economic constraints}
+Two optional constraints inject domain knowledge directly into the M-step:
+\begin{itemize}[leftmargin=1.6em]
+  \item \textbf{Pinned neutral mean} (\texttt{pin\_neutral\_zero}): force
+        $\mu_{\text{neutral}}=0$ after \eqref{eq:mstep-mu}, encoding ``the
+        sideways regime has no drift''. This is a hard equality constraint on
+        one coordinate; the remaining updates are unchanged.
+  \item \textbf{Sign constraint} (\texttt{enforce\_sign}): project the extreme
+        means onto the economically admissible half-lines,
+        $\mu_{\text{bear}}\leftarrow\min(\mu_{\text{bear}},0)$ and
+        $\mu_{\text{bull}}\leftarrow\max(\mu_{\text{bull}},0)$, so the bear
+        (bull) regime cannot end up with a positive (negative) drift.
+\end{itemize}
+Both act on the mean coordinate only, after the unconstrained update. The
+monotonicity guarantee of Proposition~\ref{prop:monotone} is stated for the
+\emph{unconstrained} M-step, so it does not transfer automatically under a
+projection; what rescues it here is concavity. Each emission objective
+$Q_i(\mu_i,\sigma_i^2)$ is, as a function of $\mu_i$, a negative quadratic and
+hence strictly concave with unconstrained maximiser \eqref{eq:mstep-mu}. For a
+strictly concave function on an interval, the maximiser over a closed feasible
+subinterval is the point of that subinterval nearest the unconstrained
+maximiser --- exactly what the clip $\min(\cdot,0)$ / $\max(\cdot,0)$ (or the
+equality $\mu_{\text{neutral}}=0$) computes. The projected value is therefore the
+\emph{constrained} maximiser of $Q$ over the feasible set, so the M-step still
+maximises $Q$ subject to the constraint and the monotone-ascent guarantee
+survives. (The sign clip is applied to the current lowest- and highest-mean
+states, which under our ordering are the bear and bull states.)
+
+% ===========================================================================
+\section{Decoding: the Viterbi algorithm}\label{sec:viterbi}
+% ===========================================================================
+
+Whereas $\gamma_t$ gives the marginally most-likely state at each $t$
+\emph{separately}, decoding asks for the single most-likely \emph{path}
+\begin{equation}
+  s^\star = \argmax_{s_{1:T}} P(\state_{1:T}=s_{1:T}\given\obs_{1:T},\theta)
+          = \argmax_{s_{1:T}} P(\state_{1:T}=s_{1:T},\obs_{1:T}\given\theta),
+\end{equation}
+the second equality holding because the data term $P(\obs_{1:T})$ does not depend
+on the path. The Viterbi algorithm solves this by the same dynamic-programming
+factorisation, with $\max$ in place of $\sum$.
+
+\begin{definition}[Viterbi variable]
+\begin{equation}
+  \delta_t(i) \eqdef \max_{s_{1:t-1}}
+  P(\state_{1:t-1}=s_{1:t-1},\,\state_t=i,\,\obs_{1:t}\given\theta),
+\end{equation}
+the probability of the best path \emph{ending} in state $i$ at time $t$.
+\end{definition}
+
+\begin{proposition}[Viterbi recursion]
+\begin{align}
+  \delta_1(i) &= \pi_i\, b_i(\obs_1),\\
+  \delta_t(j) &= \Big(\max_{i}\ \delta_{t-1}(i)\,A_{ij}\Big)\, b_j(\obs_t),
+  \qquad
+  \psi_t(j) = \argmax_{i}\ \delta_{t-1}(i)\,A_{ij},
+\end{align}
+with the optimal path recovered by back-tracking from
+$s^\star_T=\argmax_i\delta_T(i)$ via $s^\star_t=\psi_{t+1}(s^\star_{t+1})$.
+\end{proposition}
+
+\begin{proof}
+The recursion is Bellman's principle of optimality. By the joint factorisation
+\eqref{eq:joint}, the value of a path ending in $\state_t=j$ factorises as
+(value of its length-$(t-1)$ prefix ending in some $\state_{t-1}=i$)
+$\times\,A_{ij}\,b_j(\obs_t)$, where the last two factors depend on the prefix
+only through its endpoint $i$. Hence, \emph{exchange argument:} if an optimal
+length-$t$ path ending in $j$ had a prefix that were not itself the best
+length-$(t-1)$ path ending in its own endpoint $i$, we could substitute that
+better prefix --- leaving $A_{ij}b_j(\obs_t)$ unchanged --- and strictly increase
+the total, contradicting optimality. Therefore the optimal prefix is
+$\delta_{t-1}(i)$ for the appropriate $i$, and maximising the product over the
+predecessor $i$ gives the stated recursion; $\psi_t(j)$ stores the arg\,max so
+the maximiser can be reconstructed.
+\end{proof}
+
+As with the forward pass, the computation is carried out on $\log\delta$ to avoid
+underflow, turning products into sums and the $\max$ into a $\max$ of sums; this
+is \emph{exact} (the logarithm is monotone, so it commutes with $\max$). Viterbi
+is used for offline analysis --- e.g.\ painting the historical regime timeline ---
+not for live trading, which must be causal.
+
+% ===========================================================================
+\section{Online inference: filtering and prediction}\label{sec:filtering}
+% ===========================================================================
+
+For trading we may use \emph{only past and present} data at each decision point;
+using $\gamma_t$ (which conditions on the whole series, including the future)
+would constitute look-ahead. The causal analogue of $\gamma_t$ is the
+\emph{filtered belief}.
+
+\begin{definition}[Filtered belief]
+\begin{equation}
+  \hat\gamma_t(i) \eqdef P(\state_t=i\given\obs_{1:t},\theta)
+  = \frac{\fwd_t(i)}{\sum_{j}\fwd_t(j)} .
+\end{equation}
+\end{definition}
+This is just the forward variable normalised across states at time $t$ --- it uses
+no backward pass and hence no future information. In log-space the code computes
+$\log\hat\gamma_t(i)=\ell\fwd_t(i)-\operatorname{LSE}_j\ell\fwd_t(j)$.
+
+\paragraph{One-step state prediction.}
+Given the belief at $t$, the predicted state distribution for $t+1$ propagates
+through the transition matrix. Writing the belief as a column vector
+$\hat\gamma_t\in\R^{\nstate}$,
+\begin{equation}\label{eq:predict-state}
+  p_{t+1}(j) \eqdef P(\state_{t+1}=j\given\obs_{1:t})
+  = \sum_i \hat\gamma_t(i)\,A_{ij}
+  = \big(A\Tr \hat\gamma_t\big)_j .
+\end{equation}
+(The transpose appears because $A$ is row-stochastic: $A_{ij}$ maps \emph{from}
+$i$ \emph{to} $j$, so summing over the originating index $i$ is multiplication by
+$A\Tr$.)
+
+\paragraph{Predictive moments of tomorrow's return.}
+Conditional on $\obs_{1:t}$, the next return $\obs_{t+1}$ is distributed as a
+\emph{mixture of Gaussians} with weights $p_{t+1}(j)$:
+\begin{equation}
+  \obs_{t+1}\given\obs_{1:t} \ \sim\ \sum_{j=1}^{\nstate} p_{t+1}(j)\,\Normal(\mu_j,\sigma_j^2).
+\end{equation}
+Its first two predictive moments follow from the tower property. The mean is
+\begin{equation}\label{eq:pred-mean}
+  m_{t+1}\eqdef\E[\obs_{t+1}\given\obs_{1:t}] = \sum_j p_{t+1}(j)\,\mu_j ,
+\end{equation}
+and, using $\E[X^2]=\Var(X)+\E[X]^2$ within each component,
+$\E[\obs_{t+1}^2\given\obs_{1:t}]=\sum_j p_{t+1}(j)\big(\sigma_j^2+\mu_j^2\big)$, so the
+predictive variance is
+\begin{equation}\label{eq:pred-var}
+  v_{t+1}\eqdef\Var(\obs_{t+1}\given\obs_{1:t})
+  = \sum_{j} p_{t+1}(j)\big(\sigma_j^2+\mu_j^2\big) \;-\; m_{t+1}^2 .
+\end{equation}
+Equation \eqref{eq:pred-var} is the \emph{law of total variance} with the regime
+$\state_{t+1}$ as the conditioning variable, the relevant law being the one-step
+predictive $\state_{t+1}\sim p_{t+1}$:
+\begin{equation}
+  \Var(\obs_{t+1}\given\obs_{1:t})
+  = \E_{\state_{t+1}\sim p_{t+1}}\!\big[\,\sigma^2_{\state_{t+1}}\,\big]
+  + \Var_{\state_{t+1}\sim p_{t+1}}\!\big(\mu_{\state_{t+1}}\big),
+\end{equation}
+i.e.\ the expected within-regime variance plus the across-regime dispersion of
+means, both taken under $p_{t+1}$. (Both terms are conditional on $\obs_{1:t}$
+through $p_{t+1}$; the inner $\E$ and $\Var$ average over the predicted regime.)
+This is the single most important output for sizing: in a confident
+low-volatility bull belief $v_{t+1}$ is small, whereas a belief that mixes a
+high-variance bear state inflates $v_{t+1}$ even when the directional mean
+$m_{t+1}$ is ambiguous.
+
+% ===========================================================================
+\section{From belief to position}\label{sec:trading}
+% ===========================================================================
+
+A trading rule is a map from the predictive summary $(p_{t+1},m_{t+1},v_{t+1})$
+to a target position $w_{t+1}\in[-L,L]$, where $w=+1$ denotes fully long, $w=-1$
+fully short, and $L$ is a leverage cap. Three rules are provided.
+
+\subsection{Threshold rule}
+The simplest rule acts only on directional confidence:
+\begin{equation}
+  w_{t+1} =
+  \begin{cases}
+    +1, & p_{t+1}(\text{bull}) > \tau,\\
+    -1, & p_{t+1}(\text{bear}) > \tau,\\
+    \phantom{+}0, & \text{otherwise,}
+  \end{cases}
+\end{equation}
+for a confidence threshold $\tau\in(\tfrac12,1)$. It is robust and easy to reason
+about, but ignores the magnitude of the expected edge and the predictive
+variance.
+
+\subsection{Mean--variance (fractional-Kelly) rule}\label{sec:kelly}
+The rule that carries most of the model's value sizes the position by the
+\emph{risk-adjusted} expected return. Consider a one-period mean--variance
+objective for a position $w$ in an asset with predictive mean $m_{t+1}$ and
+variance $v_{t+1}$,
+\begin{equation}
+  U(w) = w\,m_{t+1} - \tfrac{\lambda}{2}\, w^2 v_{t+1},
+\end{equation}
+where $\lambda>0$ is a risk-aversion coefficient. Setting $U'(w)=m_{t+1}-\lambda
+w v_{t+1}=0$ gives the optimum
+\begin{equation}\label{eq:kelly}
+  \boxed{\;w_{t+1}^\star = \frac{m_{t+1}}{\lambda\, v_{t+1}},\;}
+  \qquad\text{then clip to } [-L,L].
+\end{equation}
+Equation~\eqref{eq:kelly} is the \emph{exact} optimum of the stated
+mean--variance utility $U$. It is closely related to --- but not identical with
+--- the Kelly criterion, and it is worth being precise about the difference, as
+the two are routinely conflated. The Kelly (growth-optimal) fraction maximises
+the expected log-growth $\E[\log(1+w\,\obs_{t+1})]$. Two caveats apply for
+Gaussian returns:
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+  \item \textbf{The objective is degenerate.} A Gaussian has full support on
+        $\R$, so for any $w\ne 0$ the event $\{1+w\obs_{t+1}<0\}$ has positive
+        probability and $\E[\log(1+w\obs_{t+1})]=-\infty$. Literal log-growth is
+        therefore ill-defined here; the operative criterion is the
+        \emph{quadratic} utility $U$, not log-utility.
+  \item \textbf{$m/v$ is an approximation.} Expanding
+        $\log(1+x)\approx x-\tfrac12 x^2$ gives
+        $\E[\log(1+w\obs_{t+1})]\approx w m_{t+1}-\tfrac12 w^2(v_{t+1}+m_{t+1}^2)$,
+        whose maximiser is $w^\star = m_{t+1}/(v_{t+1}+m_{t+1}^2)$. Only after the
+        further approximation $m_{t+1}^2\ll v_{t+1}$ --- valid for daily returns,
+        where the squared drift is tiny next to the variance --- does this reduce
+        to $m_{t+1}/v_{t+1}$.
+\end{enumerate}
+With those qualifications, \eqref{eq:kelly} at $\lambda=1$ is the
+small-return approximation to full Kelly, and $\lambda>1$ is \emph{fractional}
+Kelly (a deliberately scaled-down bet). The economically important feature is
+robust to all of this: the appearance of $v_{t+1}$ in the denominator is exactly
+why the regime model is useful for risk control --- even with an unchanged
+directional view $m_{t+1}$, the position automatically shrinks when the belief
+admits a high-variance (bear/stressed) regime. The clip enforces the leverage
+cap.
+
+\subsection{Smooth (tanh) rule}
+A continuous, bounded alternative maps the expected return through a hyperbolic
+tangent,
+\begin{equation}
+  w_{t+1} = \tanh\!\Big(\frac{m_{t+1}}{c}\Big),
+\end{equation}
+where $c>0$ is the return scale at which the position reaches
+$\tanh(1)\approx0.76$ of full size. It avoids the discontinuity of the threshold
+rule and needs no variance estimate, at the cost of not penalising risk
+directly.
+
+\subsection{Transaction-cost control: the no-trade band}
+Rebalancing every day to a slightly different target incurs transaction costs
+that can erase a thin edge. We impose hysteresis: letting $w^{\text{prev}}$ be the
+position currently held and $w^{\text{tgt}}$ the freshly computed target,
+\begin{equation}
+  w_{t+1} =
+  \begin{cases}
+    w^{\text{prev}}, & |w^{\text{tgt}}-w^{\text{prev}}| < \text{band},\\
+    w^{\text{tgt}}, & \text{otherwise.}
+  \end{cases}
+\end{equation}
+The band should be set so that a rebalance fires only when the change in target
+position is large enough that the expected gain exceeds the round-trip cost of
+trading it.
+
+% ===========================================================================
+\section{Out-of-sample evaluation: walk-forward backtesting}\label{sec:backtest}
+% ===========================================================================
+
+A backtest must never let information from the future leak into a past decision.
+The harness enforces this by a \emph{rolling-window} (walk-forward) protocol.
+Fix a training window length $W$ and a refit cadence $\rho$. For each trading day
+$t>W$:
+\begin{enumerate}[label=\arabic*.,leftmargin=2em]
+  \item \textbf{Fit (periodically).} If $t-W$ is a multiple of $\rho$, refit the
+        HMM by Baum--Welch on the trailing window $\obs_{t-W:t-1}$ only. (Daily
+        refitting adds noise and cost; monthly, $\rho\approx 21$, is typical.)
+  \item \textbf{Filter.} Compute the filtered belief $\hat\gamma_{t-1}$ on the
+        same trailing history, then the predictive
+        $(p_t,m_t,v_t)$ via \eqref{eq:predict-state}--\eqref{eq:pred-var}.
+  \item \textbf{Size.} Apply the chosen rule (Section~\ref{sec:trading}) and the
+        no-trade band to obtain the position $w_t$ \emph{held into} day $t$.
+  \item \textbf{Realise P\&L.} The net strategy return on day $t$ is
+        \begin{equation}
+          \Pi_t = w_t\,\obs_t \;-\; \kappa\,|w_t-w_{t-1}|,
+        \end{equation}
+        where $\kappa$ is the per-unit-turnover transaction cost (in the same
+        units as returns) and $|w_t-w_{t-1}|$ is the turnover.
+\end{enumerate}
+Because the parameters and the belief used to choose $w_t$ depend only on data up
+to $t-1$, while the return $\obs_t$ is realised \emph{after} the position is set,
+the protocol is causal by construction. The reported diagnostics --- annualised
+return and volatility, Sharpe ratio, maximum drawdown, Calmar ratio, directional
+hit rate, average gross exposure, annual turnover and cumulative cost --- are all
+computed on the out-of-sample series $(\Pi_t)$.
+
+\begin{remark}[An honesty check]
+On structureless data, a \emph{correct} causal backtest should show no edge (a
+Sharpe near zero or negative after costs). A backtest that reports a large Sharpe
+on noise is almost always evidence of look-ahead leakage, not of skill. The
+walk-forward construction above is the standard guard against that failure.
+\end{remark}
+
+% ===========================================================================
+\section{Limitations and extensions}\label{sec:extensions}
+% ===========================================================================
+
+The model is a deliberately simple baseline. The main avenues for improvement,
+roughly in order of expected impact:
+\begin{itemize}[leftmargin=1.6em]
+  \item \textbf{Heavy tails.} Replace the Gaussian emissions by Student-$t$
+        emissions to capture the fat tails of daily returns; the M-step becomes
+        an inner EM for the $t$ scale/degrees-of-freedom but the chain machinery
+        is unchanged.
+  \item \textbf{Conditional heteroskedasticity.} Let each state carry a GARCH
+        recursion (a Markov-switching GARCH) so that volatility clusters
+        \emph{within} a regime, not only across regimes.
+  \item \textbf{Autoregressive emissions.} Allow $\E[\obs_t\given\state_t,\obs_{t-1}]$
+        to depend on the previous return (Markov-switching AR), capturing
+        short-horizon momentum or reversal inside a regime.
+  \item \textbf{Duration modelling.} A plain HMM implies geometrically
+        distributed regime durations; a hidden \emph{semi}-Markov model lets the
+        dwell-time distribution be estimated.
+  \item \textbf{Model selection.} Choose $\nstate$ and the emission family by an
+        information criterion (BIC/AIC) on a validation window rather than fixing
+        $\nstate=3$ a priori.
+  \item \textbf{Multivariate / cross-asset states.} Drive a single regime chain
+        from a vector of returns (TTF, HH, Brent jointly) with multivariate
+        Gaussian emissions, so a regime is a market-wide rather than per-asset
+        object.
+\end{itemize}
+
+% ===========================================================================
+\section{Symbol dictionary and code map}\label{sec:symbols}
+% ===========================================================================
+
+Table~\ref{tab:symbols} maps the mathematical notation to the implementation in
+\texttt{src/lng\_desk/hmm/}.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Symbol & Meaning & Code \\
+\midrule
+$\nstate$ & number of hidden states ($=3$) & \texttt{n\_states} \\
+$\state_t,\ \obs_t$ & hidden state, observed return at $t$ & latent / \texttt{r[t]} \\
+$\bm\pi$ & initial state distribution & \texttt{HMMParams.pi} \\
+$A$ & row-stochastic transition matrix & \texttt{HMMParams.A} \\
+$\mu_k,\ \sigma_k^2$ & emission mean, variance of state $k$ & \texttt{HMMParams.mu}, \texttt{.sigma2} \\
+$b_k(\obs)$ & Gaussian emission density & \texttt{\_gaussian\_logpdf} (log) \\
+$\fwd_t(i),\ \bwd_t(i)$ & forward / backward variables & \texttt{\_forward\_backward} \\
+$\gamma_t(i)$ & smoothed state posterior & \texttt{gamma} \\
+$\xi_t(i,j)$ & pairwise transition posterior & \texttt{xi\_sum} (summed over $t$) \\
+$\operatorname{LSE}$ & log-sum-exp & \texttt{\_logsumexp} \\
+$\hat\gamma_t$ & filtered belief $P(\state_t\given\obs_{1:t})$ & \texttt{filter} \\
+$p_{t+1}=A\Tr\hat\gamma_t$ & one-step state prediction & \texttt{predict\_next\_state} \\
+$m_{t+1},\ v_{t+1}$ & predictive return mean / variance & \texttt{predict\_return\_moments} \\
+$s^\star$ & Viterbi MAP path & \texttt{viterbi} \\
+$\varepsilon$ & variance floor & \texttt{var\_floor} \\
+$\lambda,\ L$ & risk aversion, leverage cap & \texttt{risk\_aversion}, \texttt{leverage\_cap} \\
+$\tau,\ c$ & threshold, tanh scale & \texttt{tau}, \texttt{scale} \\
+$W,\ \rho,\ \kappa$ & train window, refit cadence, cost & \texttt{train\_window}, \texttt{refit\_every}, \texttt{cost\_bps} \\
+\bottomrule
+\end{tabular}
+\caption{Notation-to-code dictionary.}
+\label{tab:symbols}
+\end{table}
+
+\paragraph{Summary.} The pipeline is: \emph{fit} parameters by multi-start
+Baum--Welch on a trailing window (Section~\ref{sec:em}), with the variance floor
+and label ordering of Section~\ref{sec:decisions}; \emph{filter} causally to get
+the regime belief (Section~\ref{sec:filtering}); \emph{predict} tomorrow's return
+mean and variance \eqref{eq:pred-mean}--\eqref{eq:pred-var}; \emph{size} the
+position by a risk-aware rule \eqref{eq:kelly}; and \emph{evaluate} strictly out
+of sample (Section~\ref{sec:backtest}). Every step reduces to the same
+dynamic-programming factorisation of the Markov chain that makes the likelihood
+\eqref{eq:like} computable in linear time.
+
+\end{document}
