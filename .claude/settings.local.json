@@ -10,7 +10,8 @@
       "WebFetch(domain:www.inverpoint.com)",
       "WebFetch(domain:wizdolphin.es)",
       "WebFetch(domain:www.bizalia.com)",
-      "Bash(grep -iE 'http|source|url|fuente' __TRACKED_VAR__.md)"
+      "Bash(grep -iE 'http|source|url|fuente' __TRACKED_VAR__.md)",
+      "Bash(python scripts/merge_jkm_daily.py data/raw/jkm_settlements/2026-06-29/settlements.csv)"
     ]
   }
 }
