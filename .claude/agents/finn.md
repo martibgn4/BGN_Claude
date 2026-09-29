@@ -71,6 +71,12 @@ data/raw/jkm_settlements/
 
 If any value looks wrong against the rest of the curve (e.g., implausible spread to adjacent month, value > 100, value < 0), flag it in `extraction_notes.txt` and ask the user to confirm rather than guess.
 
+**Expired front-month futures — do not flag as an error.** JKM monthly futures expire; once the front contract stops trading, its printed settlement **freezes** while the `Bal Month (...)` spot assessment keeps moving with the market. This shows up as one strip going nearly flat day-on-day while its neighbours move, and a widening gap between `Bal Month (X)` and the same-month future `X26`. This is a real market-structure effect, **not** a misread or a stale screen. When a front strip has clearly expired (confirmed once by the desk; e.g. Aug26 expired ~2026-07-09, leaving Bal Month (Aug) as the traded prompt):
+- Still extract and record the expired strip's frozen value as displayed (it's the final settlement).
+- **Do not** run the day-on-day sanity check on the expired strip, and do not flag its flatness or its gap vs Bal Month — that comparison is meaningless once the future is dead.
+- Treat `Bal Month (...)` as the prompt for trend commentary. Downstream curve builds should use Bal Month for the prompt, not the frozen future.
+Extract still by exact label; the merge/`month_iso` mapping is unaffected.
+
 **Long-term**: this manual screenshot workflow exists because the user's Platts subscription does not include API entitlement. When API access is granted, replace the workflow with a direct `src/lng_desk/data/platts.py` adapter (mirror of `bloomberg.py`); the master.csv schema stays the same so downstream code is unaffected.
 
 ## What you don't do
