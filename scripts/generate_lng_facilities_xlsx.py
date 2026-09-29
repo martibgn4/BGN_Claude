@@ -169,70 +169,102 @@ def _write_table(ws, rows: list[dict], columns: list[tuple[str, str, int]],
 
 def _build_summary_sheet(ws, liquefaction: list[dict], regas: list[dict],
                          disruptions: list[dict], styles) -> None:
+    """Summary cells are formulas that pull from the other tabs.
+
+    Edits to Liquefaction/Regasification/Disruptions tabs in Excel propagate to
+    Summary on next recalc. Full-column references (e.g. !H:H) auto-extend if
+    rows are appended. Region breakdown is dynamic in the values, but the list
+    of regions is fixed at generation time — if a new region appears in the
+    data, rerun this script to refresh the region list (the existing region
+    rows will keep computing correctly regardless).
+    """
     Font, PatternFill, Alignment, _ = (
         styles["Font"], styles["PatternFill"], styles["Alignment"], styles["get_column_letter"],
     )
-    title_font = Font(bold=True, size=14)
-    header_font = Font(bold=True)
+    title_font   = Font(bold=True, size=14)
+    header_font  = Font(bold=True)
     section_fill = PatternFill("solid", fgColor="D9E1F2")
+    formula_font = Font(color="1F4E78")    # subtle blue: signals "this is a formula"
+
+    # Column-letter reference cheat sheet (matches LIQ_COLUMNS / REGAS_COLUMNS / DISRUPTION_COLUMNS order):
+    #   Liquefaction: A=facility_id, C=region, G=status, H=nameplate_mtpa, I=effective_mtpa
+    #   Regas:        A=facility_id, G=status, I=sendout_mtpa
+    #   Disruptions:  A=facility_id, E=end_date
+    LIQ_OP = "'Liquefaction — Operational'"
+    LIQ_UP = "'Liquefaction — Upcoming'"
+    REG_OP = "'Regasification — Operational'"
+    REG_UP = "'Regasification — Upcoming'"
+    DIS    = "Disruptions"
 
     ws["A1"] = "LNG Facilities — Consolidated Summary"
     ws["A1"].font = title_font
     ws["A2"] = f"Generated: {datetime.now().isoformat(timespec='seconds')}"
     ws["A2"].font = Font(italic=True, color="666666")
+    ws["A3"] = "Values pull live from the underlying tabs — edit cells there and the Summary updates on recalc."
+    ws["A3"].font = Font(italic=True, color="666666")
 
-    op_liq = [r for r in liquefaction if r["status"] in OPERATIONAL]
-    up_liq = [r for r in liquefaction if r["status"] in UPCOMING]
-    in_liq = [r for r in liquefaction if r["status"] in INACTIVE]
-
-    op_re  = [r for r in regas if r["status"] in OPERATIONAL]
-    up_re  = [r for r in regas if r["status"] in UPCOMING]
-
-    active_disrupt = [d for d in disruptions if (d.get("end_date") or "").strip() == ""]
-
-    def _sum(rows, key):
-        return sum(_to_float(r.get(key, 0)) for r in rows)
-
-    # Overall counts
-    row = 4
+    # --- Overall counts (formulas) ------------------------------------------------
+    row = 5
     ws.cell(row=row, column=1, value="Overall").font = header_font
     ws.cell(row=row, column=1).fill = section_fill
     row += 1
-    overall = [
-        ("Liquefaction facilities tracked",          len(liquefaction)),
-        ("  Operational trains",                     len(op_liq)),
-        ("  Upcoming (planned/FID/construction)",    len(up_liq)),
-        ("  Mothballed / paused / retired",          len(in_liq)),
-        ("Regasification terminals tracked",         len(regas)),
-        ("  Operational",                            len(op_re)),
-        ("  Upcoming",                               len(up_re)),
-        ("Active disruptions",                       len(active_disrupt)),
+
+    overall_formulas = [
+        ("Liquefaction facilities tracked",
+         f"=COUNTA({LIQ_OP}!A:A) + COUNTA({LIQ_UP}!A:A) - 2"),
+        ("  Operational trains",
+         f"=COUNTA({LIQ_OP}!A:A) - 1"),
+        ("  Upcoming (planned/FID/construction/commissioning)",
+         f'=COUNTIF({LIQ_UP}!G:G,"planned") + COUNTIF({LIQ_UP}!G:G,"FID") + '
+         f'COUNTIF({LIQ_UP}!G:G,"construction") + COUNTIF({LIQ_UP}!G:G,"commissioning")'),
+        ("  Mothballed / paused / retired",
+         f'=COUNTIF({LIQ_UP}!G:G,"mothballed") + COUNTIF({LIQ_UP}!G:G,"paused") + '
+         f'COUNTIF({LIQ_UP}!G:G,"retired")'),
+        ("Regasification terminals tracked",
+         f"=COUNTA({REG_OP}!A:A) + COUNTA({REG_UP}!A:A) - 2"),
+        ("  Operational",
+         f"=COUNTA({REG_OP}!A:A) - 1"),
+        ("  Upcoming",
+         f"=COUNTA({REG_UP}!A:A) - 1"),
+        ("Active disruptions (end_date blank)",
+         f"=COUNTA({DIS}!A:A) - COUNTA({DIS}!E:E)"),
     ]
-    for label, val in overall:
+    for label, formula in overall_formulas:
         ws.cell(row=row, column=1, value=label)
-        c = ws.cell(row=row, column=2, value=val)
+        c = ws.cell(row=row, column=2, value=formula)
         c.number_format = "#,##0"
+        c.font = formula_font
         row += 1
 
-    # Capacity totals
+    # --- Capacity totals (formulas) -----------------------------------------------
     row += 1
     ws.cell(row=row, column=1, value="Capacity (MTPA)").font = header_font
     ws.cell(row=row, column=1).fill = section_fill
     row += 1
-    cap = [
-        ("Operational liquefaction nameplate (MTPA)", _sum(op_liq, "nameplate_mtpa")),
-        ("Operational liquefaction effective (MTPA)", _sum(op_liq, "effective_mtpa")),
-        ("Upcoming liquefaction nameplate (MTPA)",    _sum(up_liq, "nameplate_mtpa")),
-        ("Operational regas send-out (MTPA equiv)",   _sum(op_re, "sendout_mtpa")),
-        ("Upcoming regas send-out (MTPA equiv)",      _sum(up_re, "sendout_mtpa")),
+
+    capacity_formulas = [
+        ("Operational liquefaction nameplate (MTPA)",
+         f"=SUM({LIQ_OP}!H:H)"),
+        ("Operational liquefaction effective (MTPA)",
+         f"=SUM({LIQ_OP}!I:I)"),
+        ("Upcoming liquefaction nameplate (MTPA)",
+         f'=SUMIFS({LIQ_UP}!H:H,{LIQ_UP}!G:G,"planned") + '
+         f'SUMIFS({LIQ_UP}!H:H,{LIQ_UP}!G:G,"FID") + '
+         f'SUMIFS({LIQ_UP}!H:H,{LIQ_UP}!G:G,"construction") + '
+         f'SUMIFS({LIQ_UP}!H:H,{LIQ_UP}!G:G,"commissioning")'),
+        ("Operational regas send-out (MTPA equiv)",
+         f"=SUM({REG_OP}!I:I)"),
+        ("Upcoming regas send-out (MTPA equiv)",
+         f"=SUM({REG_UP}!I:I)"),
     ]
-    for label, val in cap:
+    for label, formula in capacity_formulas:
         ws.cell(row=row, column=1, value=label)
-        c = ws.cell(row=row, column=2, value=val)
+        c = ws.cell(row=row, column=2, value=formula)
         c.number_format = "#,##0.0"
+        c.font = formula_font
         row += 1
 
-    # By region (operational liquefaction)
+    # --- By region (operational liquefaction) -------------------------------------
     row += 1
     ws.cell(row=row, column=1, value="Operational Liquefaction by Region").font = header_font
     ws.cell(row=row, column=1).fill = section_fill
@@ -242,18 +274,27 @@ def _build_summary_sheet(ws, liquefaction: list[dict], regas: list[dict],
     ws.cell(row=row, column=3, value="Effective (MTPA)").font = header_font
     ws.cell(row=row, column=4, value="Trains").font = header_font
     row += 1
-    by_region: dict[str, list[dict]] = defaultdict(list)
-    for r in op_liq:
-        by_region[r["region"]].append(r)
-    for region in sorted(by_region.keys()):
-        rs = by_region[region]
+
+    op_liq = [r for r in liquefaction if r["status"] in OPERATIONAL]
+    regions = sorted({r["region"] for r in op_liq if r.get("region")})
+    for region in regions:
+        q = region.replace('"', '""')   # escape any embedded quotes
         ws.cell(row=row, column=1, value=region)
-        ws.cell(row=row, column=2, value=_sum(rs, "nameplate_mtpa")).number_format = "#,##0.0"
-        ws.cell(row=row, column=3, value=_sum(rs, "effective_mtpa")).number_format = "#,##0.0"
-        ws.cell(row=row, column=4, value=len(rs)).number_format = "#,##0"
+        c2 = ws.cell(row=row, column=2,
+                     value=f'=SUMIFS({LIQ_OP}!H:H,{LIQ_OP}!C:C,"{q}")')
+        c2.number_format = "#,##0.0"
+        c2.font = formula_font
+        c3 = ws.cell(row=row, column=3,
+                     value=f'=SUMIFS({LIQ_OP}!I:I,{LIQ_OP}!C:C,"{q}")')
+        c3.number_format = "#,##0.0"
+        c3.font = formula_font
+        c4 = ws.cell(row=row, column=4,
+                     value=f'=COUNTIF({LIQ_OP}!C:C,"{q}")')
+        c4.number_format = "#,##0"
+        c4.font = formula_font
         row += 1
 
-    ws.column_dimensions["A"].width = 50
+    ws.column_dimensions["A"].width = 54
     ws.column_dimensions["B"].width = 18
     ws.column_dimensions["C"].width = 18
     ws.column_dimensions["D"].width = 10
@@ -361,6 +402,9 @@ def generate(db_dir: Path, out_path: Path) -> tuple[int, int, int]:
 
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
+    # Force Excel to recalculate Summary formulas on open (else cached blanks may show).
+    wb.calculation.calcMode = "auto"
+    wb.calculation.fullCalcOnLoad = True
 
     _build_summary_sheet(wb.create_sheet("Summary"), liquefaction, regas, disruptions, styles)
     _write_table(wb.create_sheet("Liquefaction — Operational"), op_liq, LIQ_COLUMNS, styles)
